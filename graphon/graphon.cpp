@@ -68,7 +68,7 @@ int main() {
         while (window.pollEvent(event))
             if (event.type == sf::Event::Closed) window.close();
             else if (event.type == sf::Event::KeyPressed) {
-                // std::cout << event.key.code << '\n';
+                std::cout << event.key.code << '\n';
                 if (event.key.code == 59) {
                     if (word.size() != 0)
                         if (event.key.control) word.clear();
@@ -83,6 +83,9 @@ int main() {
                 else if (event.key.code == 50) word.push_back('.');
                 else if (event.key.code == 53 && event.key.shift)
                     word.push_back('|');
+                else if (event.key.code == 56 && event.key.shift)
+                    word.push_back('_');
+                else if (event.key.code == 56) word.push_back('-');
                 else if (event.key.code == 58)
                     work(word, table);
                 text.setString(word);
