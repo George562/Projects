@@ -45,7 +45,7 @@ bool operator<(str& a, str& b) {
 bool into(str& a, vs& b) { for (str x: b) if (a == x) return true; return false; }
 
 int main() {
-    font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
+    font.loadFromFile("arial.ttf");
     text.setFont(font);
     text.setCharacterSize(20);
     text.setFillColor(sf::Color::Black);
@@ -68,7 +68,7 @@ int main() {
         while (window.pollEvent(event))
             if (event.type == sf::Event::Closed) window.close();
             else if (event.type == sf::Event::KeyPressed) {
-                std::cout << event.key.code << '\n';
+                // std::cout << event.key.code << '\n';
                 if (event.key.code == 59) {
                     if (word.size() != 0)
                         if (event.key.control) word.clear();
