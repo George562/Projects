@@ -178,7 +178,6 @@ void makeTable(vs& letters, mapss& rules, vs& rules_list, vvs& table) {
     str cur, buf;
     for (int i = 1; i < letters.size() && i <= 8; i++) {
         cur = letters[i];
-        // if (into(cur, table[0]) || into(rules[cur], table[0])) continue;
         table[0].push_back(cur);
         vs line(1, cur);
         for (int j = 1; j < table.size(); j++) {
