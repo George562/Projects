@@ -32,7 +32,6 @@ str operator*(str a, str b) {
 }
 void operator*=(str& a, str& b) { a = a * b; }
 bool operator<(str& a, str& b) {
-    // if (a.size() < b.size()) return true;        WHAT THE HELL
     if (a == "e") return true;
     if (b == "e") return false;
     if (a.size() == b.size()) {
@@ -68,7 +67,6 @@ int main() {
         while (window.pollEvent(event))
             if (event.type == sf::Event::Closed) window.close();
             else if (event.type == sf::Event::KeyPressed) {
-                // std::cout << event.key.code << '\n';
                 if (event.key.code == 59) {
                     if (word.size() != 0)
                         if (event.key.control) word.clear();
