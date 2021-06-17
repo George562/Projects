@@ -27,7 +27,6 @@ str operator*(str a, str b) {
 }
 void operator*=(str& a, str& b) { a = a * b; }
 bool operator<(str& a, str& b) {
-    // if (a.size() < b.size()) return true;        WHAT THE HELL
     if (a == "e") return true;
     if (b == "e") return false;
     if (a.size() == b.size()) {
@@ -42,21 +41,22 @@ bool into(str& a, vs& b) { for (str x: b) if (a == x) return true; return false;
 int main() {
     str word;
     vvs table(0);
-
     cin >> word;
     work(word, table);
     draw(table);
+    getchar();
     return 0;
 }
 
 void draw(vvs& table) {
-    for (int i = 0; i < 10 * table.size(); i++) cout << '_';
+    ofstream file("output.txt");
+    for (int i = 0; i < 9 * table.size(); i++) file << '_';
     for (int i = 0; i < table.size(); i++) {
-        cout << "\n|";
+        file << "\n|";
         for (int j = 0; j < table.size(); j++)
-            cout << setw(9) << left << table[i][j] << "|";
-        cout << '\n';
-        for (int i = 0; i < 10 * table.size(); i++) cout << '-';
+            file << setw(8) << left << table[i][j] << "|";
+        file << '\n';
+        for (int i = 0; i < 9 * table.size(); i++) file << '-';
     }
 }
 
@@ -114,7 +114,7 @@ str normalize(str w, vs& rules_list) {
 
 void makeTable(vs& letters, mapss& rules, vs& rules_list, vvs& table) {
     str cur, buf;
-    for (int i = 1; i < letters.size() && i <= 20; i++) {
+    for (int i = 1; i < letters.size() && i <= 100; i++) {
         cur = letters[i];
         table[0].push_back(cur);
         vs line(1, cur);
