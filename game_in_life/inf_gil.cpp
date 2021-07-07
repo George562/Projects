@@ -70,7 +70,7 @@ int main() {
     sf::Time time = clock.getElapsedTime();
 
     while (window.isOpen()) {
-        if (drawing) {
+        if (drawing && !settings) {
             sf::Vector2i mouse = Mouse.getPosition(window);
             x = mouse.x; y = mouse.y;
             if (0 <= x && x < scw && 0 <= y && y < sch) {
@@ -115,16 +115,16 @@ int main() {
                 
                 if (settings) {
                     sf::Vector2i mouse = Mouse.getPosition(window);
+                    int rad = circle.getRadius();
                     for (int i = 0; i < 9; i++) {
-                        int circle_x = set_x + scw / 32 + 35 * (1 + i) + 2;
-                        if (std::hypot(mouse.x - circle_x, set_y + sch / 64 + 3 - mouse.y) <= circle.getRadius() * 2)
+                        int circle_x = set_x + scw / 32 + 35 * (1 + i) + 2 + rad;
+                        if (std::hypot(circle_x - mouse.x, set_y + sch / 64 + 3 + rad - mouse.y) <= rad)
                             to_burn = (to_burn & (1 << i)) ? to_burn - (1 << i) : to_burn + (1 << i);
-                        if (std::hypot(mouse.x - circle_x, set_y + sch / 64 + 50 - mouse.y) <= circle.getRadius() * 2)
+                        if (std::hypot(circle_x - mouse.x, set_y + sch / 64 + 50 + rad - mouse.y) <= rad)
                             to_alive = (to_alive & (1 << i)) ? to_alive - (1 << i) : to_alive + (1 << i);
                     }
                 }
-            }
-            else if (event.type == sf::Event::MouseWheelScrolled)
+            } else if (event.type == sf::Event::MouseWheelScrolled)
                 if (event.mouseWheelScroll.delta != 0) {
                     sf::Vector2i mouse = Mouse.getPosition(window);
                     if (event.mouseWheelScroll.delta == 1) {
