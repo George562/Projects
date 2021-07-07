@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <math.h>
 // -lsfml-graphics -lsfml-window -lsfml-system
 struct Dude { int x, y; };
 bool operator==(Dude a, Dude b) { return a.x == b.x && a.y == b.y; }
@@ -11,19 +12,23 @@ bool operator<(Dude a, Dude b) { if (a.y == b.y) return a.x < b.x; return a.y < 
 Dude operator+(Dude a, Dude b) { return Dude{a.x + b.x, a.y + b.y}; }
 
 using vi = std::vector<int>;
-using pii = std::pair<int, int>;
 
-int size = 2, filling = 0, left = 0, top = 0, x, y;
 int scw = sf::VideoMode::getDesktopMode().width;
 int sch = sf::VideoMode::getDesktopMode().height;
-bool drawing = false, pause = true;
+int size = 2, filling = 0, left = 0, top = 0, x, y;
+int to_burn = 8, to_alive = 12, set_x = 3 * scw / 8, set_y = 7 * sch / 16;
+bool drawing = false, pause = true, settings = false;
 std::vector<Dude> dudes(0), new_dudes(0);
-vi red = {255,   0,   0}, white = {200, 200, 200}, changes(0);
+vi red = {255,   0,   0}, green = {   0, 255,   0}, white = {200, 200, 200}, changes(0);
 std::vector<Dude> dirs= {{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}};
 
 sf::RectangleShape rect1(sf::Vector2f(size, size));
+sf::RectangleShape menu(sf::Vector2f(scw / 4, sch / 8));
+sf::CircleShape circle;
 sf::Mouse Mouse;
 sf::RenderWindow window(sf::VideoMode(scw, sch), "infinity", sf::Style::Fullscreen);
+sf::Font font;
+sf::Text text, set_text;
 
 bool into(std::vector<Dude> arr, Dude d) {
     int i = std::lower_bound(arr.begin(), arr.end(), d) - arr.begin();
@@ -31,22 +36,35 @@ bool into(std::vector<Dude> arr, Dude d) {
 }
 void add(std::vector<Dude>&, Dude);
 void del(Dude);
-void draw(Dude);
+void draw();
 void step();
 void stepfor(Dude);
 int find(int, int);
 
 int main() {
     // std::ios::sync_with_stdio(false); std::cin.tie(nullptr);
-    sf::Font font;
     font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
-    sf::Text text;
     text.setFont(font);
     text.setCharacterSize(20);
     text.setFillColor(sf::Color::White);
     text.setPosition(0, 0);
     std::string word = "left: " + std::to_string(left) + "\ntop: " + std::to_string(top);
     text.setString(word);
+    
+    set_text.setFont(font);
+    set_text.setCharacterSize(20);
+    set_text.setFillColor(sf::Color::White);
+    set_text.setPosition(set_x + scw / 64, set_y + sch / 64);
+    set_text.setString("Burn\n\nAlive\n\t\t\t0\t1\t2\t3\t4\t5\t6\t7\t8");
+    
+    menu.setFillColor(sf::Color(20, 20, 20));
+    menu.setOutlineColor(sf::Color(white[0], white[1], white[2]));
+    menu.setOutlineThickness(5);
+    menu.setPosition(set_x, set_y);
+
+    circle.setRadius(10);
+    circle.setOutlineColor(sf::Color(0, 0, 0));
+    circle.setOutlineThickness(3);
 
     sf::Clock clock;
     sf::Time time = clock.getElapsedTime();
@@ -70,7 +88,7 @@ int main() {
             if (!pause) step();
 
             window.clear();
-            for (Dude dude: dudes) draw(dude);
+            draw();
             word = "x: " + std::to_string(left) + 
                     "\ny: " + std::to_string(top) + 
                     "\nx" + std::to_string(size);
@@ -86,7 +104,7 @@ int main() {
             else if (event.type == sf::Event::KeyPressed)
                 switch (event.key.code) {
                     case sf::Keyboard::Space: pause = !pause; break;
-                    case sf::Keyboard::Tab: dudes.clear(); left = top = 0; break;
+                    case sf::Keyboard::Tab: settings = !settings; break;
                     case sf::Keyboard::Escape: window.close(); break;
                 }
             else if (event.type == sf::Event::MouseButtonReleased) drawing = false;
@@ -94,6 +112,17 @@ int main() {
                 drawing = true;
                 if (event.mouseButton.button != 3)
                     filling = 1 - event.mouseButton.button;
+                
+                if (settings) {
+                    sf::Vector2i mouse = Mouse.getPosition(window);
+                    for (int i = 0; i < 9; i++) {
+                        int circle_x = set_x + scw / 32 + 35 * (1 + i) + 2;
+                        if (std::hypot(mouse.x - circle_x, set_y + sch / 64 + 3 - mouse.y) <= circle.getRadius() * 2)
+                            to_burn = (to_burn & (1 << i)) ? to_burn - (1 << i) : to_burn + (1 << i);
+                        if (std::hypot(mouse.x - circle_x, set_y + sch / 64 + 50 - mouse.y) <= circle.getRadius() * 2)
+                            to_alive = (to_alive & (1 << i)) ? to_alive - (1 << i) : to_alive + (1 << i);
+                    }
+                }
             }
             else if (event.type == sf::Event::MouseWheelScrolled)
                 if (event.mouseWheelScroll.delta != 0) {
@@ -132,12 +161,29 @@ void del(Dude d) {
     dudes.pop_back();
 }
 
-void draw(Dude d) {
-    int dx = d.x * size, dy = d.y * size;
-    if (left <= dx && dx < left + scw && top <= dy && dy < top + sch) {
-        rect1.setFillColor(sf::Color(red[0], red[1], red[2]));
-        rect1.setPosition(dx - left, dy - top);
-        window.draw(rect1);
+void draw() {
+    for (Dude d: dudes) {
+        int dx = d.x * size, dy = d.y * size;
+        if (left <= dx && dx < left + scw && top <= dy && dy < top + sch) {
+            rect1.setFillColor(sf::Color(red[0], red[1], red[2]));
+            rect1.setPosition(dx - left, dy - top);
+            window.draw(rect1);
+        }
+    }
+    if (settings) {
+        window.draw(menu);
+        window.draw(set_text);
+        for (int i = 0; i < 9; i++) {
+            if (to_burn & (1 << i)) circle.setFillColor(sf::Color(green[0], green[1], green[2]));
+            else circle.setFillColor(sf::Color(red[0], red[1], red[2]));
+            circle.setPosition(set_x + scw / 32 + 35 * (1 + i) + 2, set_y + sch / 64 + 3);
+            window.draw(circle);
+
+            if (to_alive & (1 << i)) circle.setFillColor(sf::Color(green[0], green[1], green[2]));
+            else circle.setFillColor(sf::Color(red[0], red[1], red[2]));
+            circle.setPosition(set_x + scw / 32 + 35 * (1 + i) + 2, set_y + sch / 64 + 50);
+            window.draw(circle);
+        }
     }
 }
 
@@ -145,13 +191,13 @@ void step() {
     changes.clear(); new_dudes.clear();
     int count, size = dudes.size();
     for (int i = size - 1; i >= 0; i--) {
-        count = 0;
+        count = 1;
         for (Dude ch: dirs) {
             Dude d = dudes[i] + ch;
-            if (into(dudes, d)) count++;
+            if (into(dudes, d)) count <<= 1;
             else if (!into(new_dudes, d)) stepfor(d);
         }
-        if (count != 2 && count != 3) changes.push_back(i);
+        if (!(count & to_alive)) changes.push_back(i);
     }
     for (int i = 0; i < changes.size(); i++) {
         std::swap(dudes[changes[i]], dudes[dudes.size() - 1]);
@@ -162,7 +208,7 @@ void step() {
 }
 
 void stepfor(Dude d) {
-    int count = 0;
-    for (Dude ch: dirs) if (into(dudes, d + ch)) count++;
-    if (count == 3) add(new_dudes, d);
+    int count = 1;
+    for (Dude ch: dirs) if (into(dudes, d + ch)) count <<= 1;
+    if (count & to_burn) add(new_dudes, d);
 }
