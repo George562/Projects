@@ -29,6 +29,7 @@ sf::Mouse Mouse;
 sf::RenderWindow window(sf::VideoMode(scw, sch), "infinity", sf::Style::Fullscreen);
 sf::Font font;
 sf::Text text, set_text;
+std::string word;
 
 bool into(std::vector<Dude> arr, Dude d) {
     int i = std::lower_bound(arr.begin(), arr.end(), d) - arr.begin();
