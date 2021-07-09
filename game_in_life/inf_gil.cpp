@@ -23,9 +23,10 @@ vi red = {255,   0,   0}, green = {   0, 255,   0}, white = {200, 200, 200}, cha
 std::vector<Dude> dirs= {{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}};
 
 sf::RectangleShape rect1(sf::Vector2f(size, size));
-sf::RectangleShape menu(sf::Vector2f(scw / 4, sch / 8));
+sf::RectangleShape menu_plato(sf::Vector2f(scw / 4, sch / 8));
 sf::CircleShape circle;
 sf::Mouse Mouse;
+sf::Vector2i mouse;
 sf::RenderWindow window(sf::VideoMode(scw, sch), "infinity", sf::Style::Fullscreen);
 sf::Font font;
 sf::Text text, set_text;
@@ -55,10 +56,10 @@ int main() {
     set_text.setPosition(set_x + scw / 64, set_y + sch / 64);
     set_text.setString("Burn\n\nAlive\n\t\t\t0\t1\t2\t3\t4\t5\t6\t7\t8");
     
-    menu.setFillColor(sf::Color(20, 20, 20));
-    menu.setOutlineColor(sf::Color(white[0], white[1], white[2]));
-    menu.setOutlineThickness(5);
-    menu.setPosition(set_x, set_y);
+    menu_plato.setFillColor(sf::Color(20, 20, 20));
+    menu_plato.setOutlineColor(sf::Color(white[0], white[1], white[2]));
+    menu_plato.setOutlineThickness(5);
+    menu_plato.setPosition(set_x, set_y);
 
     circle.setRadius(10);
     circle.setOutlineColor(sf::Color(0, 0, 0));
@@ -69,7 +70,7 @@ int main() {
 
     while (window.isOpen()) {
         if (drawing && !settings) {
-            sf::Vector2i mouse = Mouse.getPosition(window);
+            mouse = Mouse.getPosition(window);
             x = mouse.x; y = mouse.y;
             if (0 <= x && x < scw && 0 <= y && y < sch) {
                 x = (mouse.x + left) / size; y = (mouse.y + top) / size;
@@ -77,14 +78,17 @@ int main() {
                 else del(Dude{x, y});
             }
         }
+        
+        if (dudes.size() > 2000 && !pause) step();
 
         if (clock.getElapsedTime() - time >= sf::milliseconds(50)) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) top -= size * 4;
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) left -= size * 4;
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) top += size * 4;
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) left += size * 4;
-            if (!pause) step();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) top -= size;
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) left -= size;
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) top += size;
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) left += size;
 
+            if (dudes.size() <= 2000 && !pause) step();
+            
             window.clear();
             draw();
             word = "x: " + std::to_string(left) +
@@ -114,7 +118,7 @@ int main() {
                     filling = 1 - event.mouseButton.button;
                 
                 if (settings) {
-                    sf::Vector2i mouse = Mouse.getPosition(window);
+                    mouse = Mouse.getPosition(window);
                     int rad = circle.getRadius();
                     for (int i = 0; i < 9; i++) {
                         int circle_x = set_x + scw / 32 + 35 * (1 + i) + 2 + rad;
@@ -126,7 +130,7 @@ int main() {
                 }
             } else if (event.type == sf::Event::MouseWheelScrolled)
                 if (event.mouseWheelScroll.delta != 0) {
-                    sf::Vector2i mouse = Mouse.getPosition(window);
+                    mouse = Mouse.getPosition(window);
                     if (event.mouseWheelScroll.delta == 1) {
                         left = left * 2 + mouse.x;
                         top = top * 2 + mouse.y;
@@ -171,7 +175,7 @@ void draw() {
         }
     }
     if (settings) {
-        window.draw(menu);
+        window.draw(menu_plato);
         window.draw(set_text);
         for (int i = 0; i < 9; i++) {
             if (to_burn & (1 << i)) circle.setFillColor(sf::Color(green[0], green[1], green[2]));
@@ -195,20 +199,21 @@ void step() {
         for (Dude ch: dirs) {
             Dude d = dudes[i] + ch;
             if (into(dudes, d)) count <<= 1;
-            else if (!into(new_dudes, d)) stepfor(d);
+            else stepfor(d);
         }
         if (!(count & to_alive)) changes.push_back(i);
     }
-    for (int i = 0; i < changes.size(); i++) {
-        std::swap(dudes[changes[i]], dudes[dudes.size() - 1]);
-        dudes.pop_back();
-    }
-    for (Dude d: new_dudes) dudes.push_back(d);
+    for (int i = 0; i < changes.size(); i++, size--)
+        std::swap(dudes[changes[i]], dudes[size - 1]);
+    dudes.resize(size);
+    std::sort(new_dudes.begin(), new_dudes.end());
+    for (int i = 0; i < new_dudes.size(); i++)
+        if (i == 0 || new_dudes[i - 1] < new_dudes[i]) dudes.push_back(new_dudes[i]);
     std::sort(dudes.begin(), dudes.end());
 }
 
 void stepfor(Dude d) {
     int count = 1;
     for (Dude ch: dirs) if (into(dudes, d + ch)) count <<= 1;
-    if (count & to_burn) add(new_dudes, d);
+    if (count & to_burn) new_dudes.push_back(d);
 }
