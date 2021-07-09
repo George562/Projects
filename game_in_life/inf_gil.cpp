@@ -39,7 +39,6 @@ void del(Dude);
 void draw();
 void step();
 void stepfor(Dude);
-int find(int, int);
 
 int main() {
     // std::ios::sync_with_stdio(false); std::cin.tie(nullptr);
