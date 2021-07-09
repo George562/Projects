@@ -47,8 +47,6 @@ int main() {
     text.setCharacterSize(20);
     text.setFillColor(sf::Color::White);
     text.setPosition(0, 0);
-    std::string word = "left: " + std::to_string(left) + "\ntop: " + std::to_string(top);
-    text.setString(word);
     
     set_text.setFont(font);
     set_text.setCharacterSize(20);
@@ -88,9 +86,11 @@ int main() {
 
             window.clear();
             draw();
-            word = "x: " + std::to_string(left) + 
-                    "\ny: " + std::to_string(top) + 
-                    "\nx" + std::to_string(size);
+            word = "x: " + std::to_string(left) +
+                    "\ny: " + std::to_string(top) +
+                    "\nx" + std::to_string(size) +
+                    "\ncount of dudes: " + std::to_string(dudes.size()) +
+                    "\n" + std::to_string((clock.getElapsedTime() - time).asSeconds());
             text.setString(word);
             window.draw(text);
             window.display();
