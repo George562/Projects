@@ -11,16 +11,14 @@ bool operator!=(Dude a, Dude b) { return a.x != b.x || a.y != b.y; }
 bool operator<(Dude a, Dude b) { if (a.y == b.y) return a.x < b.x; return a.y < b.y; }
 Dude operator+(Dude a, Dude b) { return Dude{a.x + b.x, a.y + b.y}; }
 
-using vi = std::vector<int>;
-
 int scw = sf::VideoMode::getDesktopMode().width;
 int sch = sf::VideoMode::getDesktopMode().height;
 int size = 2, filling = 0, left = 0, top = 0, x, y;
 int to_burn = 8, to_alive = 12, set_x = 3 * scw / 8, set_y = 7 * sch / 16;
 bool drawing = false, pause = true, settings = false;
 std::vector<Dude> dudes(0), new_dudes(0);
-vi red = {255,   0,   0}, green = {   0, 255,   0}, white = {200, 200, 200}, changes(0);
-std::vector<Dude> dirs= {{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}};
+std::vector<int> red = {255,   0,   0}, green = {   0, 255,   0}, white = {200, 200, 200}, changes(0);
+std::vector<Dude> dirs = {{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}};
 
 sf::RectangleShape rect1(sf::Vector2f(size, size));
 sf::RectangleShape menu_plato(sf::Vector2f(scw / 4, sch / 8));
@@ -31,8 +29,9 @@ sf::RenderWindow window(sf::VideoMode(scw, sch), "infinity", sf::Style::Fullscre
 sf::Font font;
 sf::Text text, set_text;
 std::string word;
+sf::Event event;
 
-bool into(std::vector<Dude> arr, Dude d) {
+bool into(std::vector<Dude>& arr, Dude d) {
     int i = std::lower_bound(arr.begin(), arr.end(), d) - arr.begin();
     return !(arr.empty() || (arr[i] != d && (i + 1 < arr.size() || arr[i + 1] != d)));
 }
@@ -40,13 +39,13 @@ void add(std::vector<Dude>&, Dude);
 void del(Dude);
 void draw();
 void step();
-void stepfor(Dude);
+void stepfor(int, int);
 
 int main() {
-    // std::ios::sync_with_stdio(false); std::cin.tie(nullptr);
+    std::ios::sync_with_stdio(false); std::cin.tie(nullptr);
     font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
     text.setFont(font);
-    text.setCharacterSize(20);
+    text.setCharacterSize(18);
     text.setFillColor(sf::Color::White);
     text.setPosition(0, 0);
     
@@ -102,7 +101,6 @@ int main() {
             time = clock.getElapsedTime();
         }
 
-        sf::Event event;
         while (window.pollEvent(event))
             if (event.type == sf::Event::Closed) window.close();
             else if (event.type == sf::Event::KeyPressed)
@@ -114,7 +112,7 @@ int main() {
             else if (event.type == sf::Event::MouseButtonReleased) drawing = false;
             else if (event.type == sf::Event::MouseButtonPressed) {
                 drawing = true;
-                if (event.mouseButton.button != 3)
+                if (event.mouseButton.button != sf::Mouse::Button::Middle)
                     filling = 1 - event.mouseButton.button;
                 
                 if (settings) {
@@ -196,11 +194,9 @@ void step() {
     int count, size = dudes.size();
     for (int i = size - 1; i >= 0; i--) {
         count = 1;
-        for (Dude ch: dirs) {
-            Dude d = dudes[i] + ch;
-            if (into(dudes, d)) count <<= 1;
-            else stepfor(d);
-        }
+        for (int j = 0; j < 8; j++)
+            if (into(dudes, dudes[i] + dirs[j])) count <<= 1;
+            else stepfor(i, j);
         if (!(count & to_alive)) changes.push_back(i);
     }
     for (int i = 0; i < changes.size(); i++, size--)
@@ -212,8 +208,9 @@ void step() {
     std::sort(dudes.begin(), dudes.end());
 }
 
-void stepfor(Dude d) {
-    int count = 1;
-    for (Dude ch: dirs) if (into(dudes, d + ch)) count <<= 1;
-    if (count & to_burn) new_dudes.push_back(d);
+void stepfor(int i, int j) {
+    int count = 2;
+    for (int k = (j + 5) % 8; k != (j + 4) % 8; k = ++k % 8)
+        if (into(dudes, dudes[i] + dirs[k] + dirs[j])) count <<= 1;
+    if (count & to_burn) new_dudes.push_back(dudes[i] + dirs[j]);
 }
