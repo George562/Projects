@@ -167,8 +167,9 @@ void del(Dude d) {
 }
 
 void draw() {
-    for (Dude d: dudes) {
-        int dx = d.x * size, dy = d.y * size;
+    int dx, dy;
+    for (int i = 0; i < dudes.size(); i++) {
+        dx = dudes[i].x * size; dy = dudes[i].y * size;
         if (left <= dx && dx < left + scw && top <= dy && dy < top + sch) {
             rect1.setPosition(dx - left, dy - top);
             window.draw(rect1);
