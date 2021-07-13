@@ -6,10 +6,10 @@
 #include <math.h>
 // -lsfml-graphics -lsfml-window -lsfml-system
 struct Dude { int x, y; };
-bool operator==(Dude a, Dude b) { return a.x == b.x && a.y == b.y; }
-bool operator!=(Dude a, Dude b) { return a.x != b.x || a.y != b.y; }
+bool operator==(Dude& a, Dude& b) { return a.x == b.x && a.y == b.y; }
+bool operator!=(Dude& a, Dude& b) { return a.x != b.x || a.y != b.y; }
 bool operator<(Dude a, Dude b) { if (a.y == b.y) return a.x < b.x; return a.y < b.y; }
-Dude operator+(Dude a, Dude b) { return Dude{a.x + b.x, a.y + b.y}; }
+Dude operator+(Dude& a, Dude& b) { return Dude{a.x + b.x, a.y + b.y}; }
 
 int scw = sf::VideoMode::getDesktopMode().width;
 int sch = sf::VideoMode::getDesktopMode().height;
@@ -19,6 +19,7 @@ bool drawing = false, pause = true, settings = false;
 std::vector<Dude> dudes(0), new_dudes(0);
 std::vector<int> red = {255,   0,   0}, green = {   0, 255,   0}, white = {200, 200, 200}, changes(0);
 std::vector<Dude> dirs = {{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}};
+Dude bufferDude;
 
 sf::RectangleShape rect1(sf::Vector2f(size, size));
 sf::RectangleShape menu_plato(sf::Vector2f(scw / 4, sch / 8));
@@ -210,7 +211,8 @@ void step() {
 
 void stepfor(int i, int j) {
     int count = 2;
+    bufferDude = dudes[i] + dirs[j];
     for (int k = (j + 5) % 8; k != (j + 4) % 8; k = ++k % 8)
-        if (into(dudes, dudes[i] + dirs[k] + dirs[j])) count <<= 1;
-    if (count & to_burn) new_dudes.push_back(dudes[i] + dirs[j]);
+        if (into(dudes, bufferDude + dirs[k])) count <<= 1;
+    if (count & to_burn) new_dudes.push_back(bufferDude);
 }
