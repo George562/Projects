@@ -65,6 +65,8 @@ int main() {
     circle.setOutlineColor(sf::Color(0, 0, 0));
     circle.setOutlineThickness(3);
 
+    rect1.setFillColor(sf::Color(red[0], red[1], red[2]));
+
     sf::Clock clock;
     sf::Time time = clock.getElapsedTime();
 
@@ -168,7 +170,6 @@ void draw() {
     for (Dude d: dudes) {
         int dx = d.x * size, dy = d.y * size;
         if (left <= dx && dx < left + scw && top <= dy && dy < top + sch) {
-            rect1.setFillColor(sf::Color(red[0], red[1], red[2]));
             rect1.setPosition(dx - left, dy - top);
             window.draw(rect1);
         }
