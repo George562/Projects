@@ -28,7 +28,7 @@ sf::Mouse Mouse;
 sf::Vector2i mouse;
 sf::RenderWindow window(sf::VideoMode(scw, sch), "infinity", sf::Style::Fullscreen);
 sf::Font font;
-sf::Text text, set_text;
+sf::Text text, menu_text;
 std::string word;
 sf::Event event;
 
@@ -50,11 +50,11 @@ int main() {
     text.setFillColor(sf::Color::White);
     text.setPosition(0, 0);
     
-    set_text.setFont(font);
-    set_text.setCharacterSize(20);
-    set_text.setFillColor(sf::Color::White);
-    set_text.setPosition(set_x + scw / 64, set_y + sch / 64);
-    set_text.setString("Burn\n\nAlive\n\t\t\t0\t1\t2\t3\t4\t5\t6\t7\t8");
+    menu_text.setFont(font);
+    menu_text.setCharacterSize(20);
+    menu_text.setFillColor(sf::Color::White);
+    menu_text.setPosition(set_x + scw / 64, set_y + sch / 64);
+    menu_text.setString("Born\n\nAlive\n\t\t\t0\t1\t2\t3\t4\t5\t6\t7\t8");
     
     menu_plato.setFillColor(sf::Color(20, 20, 20));
     menu_plato.setOutlineColor(sf::Color(white[0], white[1], white[2]));
@@ -160,9 +160,8 @@ void del(Dude d) {
     if (dudes.empty()) return;
     int i = std::lower_bound(dudes.begin(), dudes.end(), d) - dudes.begin();
     if (i >= dudes.size() || (dudes[i] != d && (i + 1 < dudes.size() || dudes[i + 1] != d))) return;
-    int j = dudes.size() - 1;
-    std::swap(dudes[i], dudes[j]);
-    for (; i < j - 1; i++) std::swap(dudes[i], dudes[i + 1]);
+    std::swap(dudes[i], dudes[dudes.size() - 1]);
+    for (; i < dudes.size() - 2; i++) std::swap(dudes[i], dudes[i + 1]);
     dudes.pop_back();
 }
 
@@ -177,7 +176,7 @@ void draw() {
     }
     if (settings) {
         window.draw(menu_plato);
-        window.draw(set_text);
+        window.draw(menu_text);
         for (int i = 0; i < 9; i++) {
             if (to_burn & (1 << i)) circle.setFillColor(sf::Color(green[0], green[1], green[2]));
             else circle.setFillColor(sf::Color(red[0], red[1], red[2]));
