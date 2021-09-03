@@ -8,7 +8,7 @@
 struct Dude { int x, y; };
 bool operator==(Dude& a, Dude& b) { return a.x == b.x && a.y == b.y; }
 bool operator!=(Dude& a, Dude& b) { return a.x != b.x || a.y != b.y; }
-bool operator<(Dude a, Dude b) { if (a.y == b.y) return a.x < b.x; return a.y < b.y; }
+bool operator<(Dude& a, Dude b) { if (a.y == b.y) return a.x < b.x; return a.y < b.y; }
 Dude operator+(Dude& a, Dude& b) { return Dude{a.x + b.x, a.y + b.y}; }
 
 int scw = sf::VideoMode::getDesktopMode().width;
@@ -43,7 +43,7 @@ void step();
 void stepfor(int, int);
 
 int main() {
-    std::ios::sync_with_stdio(false); std::cin.tie(nullptr);
+    std::ios::sync_with_stdio(false); std::cin.tie(nullptr); std::cout.tie();
     font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
     text.setFont(font);
     text.setCharacterSize(18);
@@ -122,7 +122,7 @@ int main() {
                     mouse = Mouse.getPosition(window);
                     int rad = circle.getRadius();
                     for (int i = 0; i < 9; i++) {
-                        int circle_x = set_x + scw / 32 + 35 * (1 + i) + 2 + rad;
+                        int circle_x = set_x + scw / 32 + scw / 53 * (1 + i) - i + rad;
                         if (std::hypot(circle_x - mouse.x, set_y + sch / 64 + 3 + rad - mouse.y) <= rad)
                             to_burn = (to_burn & (1 << i)) ? to_burn - (1 << i) : to_burn + (1 << i);
                         if (std::hypot(circle_x - mouse.x, set_y + sch / 64 + 50 + rad - mouse.y) <= rad)
@@ -180,12 +180,12 @@ void draw() {
         for (int i = 0; i < 9; i++) {
             if (to_burn & (1 << i)) circle.setFillColor(sf::Color(green[0], green[1], green[2]));
             else circle.setFillColor(sf::Color(red[0], red[1], red[2]));
-            circle.setPosition(set_x + scw / 32 + 35 * (1 + i) + 2, set_y + sch / 64 + 3);
+            circle.setPosition(set_x + scw / 32 + scw / 53 * (1 + i) - i, set_y + sch / 64 + 3);
             window.draw(circle);
 
             if (to_alive & (1 << i)) circle.setFillColor(sf::Color(green[0], green[1], green[2]));
             else circle.setFillColor(sf::Color(red[0], red[1], red[2]));
-            circle.setPosition(set_x + scw / 32 + 35 * (1 + i) + 2, set_y + sch / 64 + 50);
+            circle.setPosition(set_x + scw / 32 + scw / 53 * (1 + i) - i, set_y + sch / 64 + 50);
             window.draw(circle);
         }
     }
