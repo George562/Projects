@@ -1,4 +1,5 @@
 #include "bullet.h"
+#include "Bar.h"
 
 ////////////////////////////////////////////////////////////
 // Weapon
@@ -15,6 +16,7 @@ public:
     int mode;
     
     sf::RectangleShape AmmoRect[3];
+    Bar<int> AmmoBar;
     PlaccedText NameText, AmmoText;
 
     Weapon() {};
@@ -37,7 +39,12 @@ public:
         AmmoRect[2] = AmmoRect[1];
         AmmoRect[2].setFillColor(sf::Color(32, 32, 32, 160));
 
-        NameText.setPosition(scw - AmmoRect[0].getSize().x - 10, AmmoRect[0].getPosition().y + AmmoRect[0].getSize().y);
+        AmmoBar.setSize(160, 40);
+        AmmoBar.setPosition(scw - AmmoBar.getSize().x - 10, 120);
+        AmmoBar.scale = &ammunition;
+        AmmoBar.setColors(sf::Color(255, 255, 255, 160), sf::Color(128, 128, 128, 160), sf::Color(32, 32, 32, 160));
+
+        NameText.setPosition(scw - AmmoBar.getSize().x - 10, AmmoBar.getPosition().y + AmmoBar.getSize().y);
         NameText.text.setFillColor(sf::Color(25, 192, 25, 160));
     }
 
@@ -58,7 +65,7 @@ public:
         RotateOn(-M_PI * (rand() % (int)scatter - scatter / 2) / 180, dx, dy);
         dx *= velocity / len; dy *= velocity / len;
         Bullet* newBullet = new Bullet(player.PosX + player.Width / 2, player.PosY + player.Height / 2, dx, dy,
-                                       sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7);
+                                       sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7, 0);
         Bullets.push_back(*newBullet);
         delete newBullet;
         ammunition -= 1;
@@ -73,12 +80,10 @@ public:
 
     virtual void interface(sf::RenderWindow& window) {
         AmmoText.setText(std::to_string((int)ammunition.cur));
-        AmmoText.setPosition(AmmoRect[0].getPosition().x + AmmoRect[0].getSize().x / 2 - AmmoText.Width  / 2,
-                             AmmoRect[0].getPosition().y + AmmoRect[0].getSize().y / 2 - AmmoText.Height / 2);
-        AmmoRect[1].setScale(ammunition.filling(), 1);
-        window.draw(AmmoRect[0]);
-        window.draw(AmmoRect[2]);
-        window.draw(AmmoRect[1]);
+        AmmoText.setPosition(AmmoBar.getPosition().x + AmmoBar.getSize().x / 2 - AmmoText.Width  / 2,
+                             AmmoBar.getPosition().y + AmmoBar.getSize().y / 2 - AmmoText.Height / 2);
+
+        AmmoBar.draw(window);
         AmmoText.draw(window);
         NameText.draw(window);
     }
@@ -88,7 +93,7 @@ public:
 // Pistol
 class Pistol : public Weapon {
 public:
-    Pistol() : Weapon(9, 1, 0.35, 2) { velocity = 8; count = 1;  scatter = 20; NameText.setText("Pistol"); }
+    Pistol() : Weapon(9, 1, 0.35, 2) { velocity = 10; count = 1;  scatter = 20; NameText.setText("Pistol"); }
     void Update(vB& Bullets, Rect& player, sf::Clock* clock, sf::Vector2f* camera) {
         if (!lock && ammunition.toBottom() != 0 && clock->getElapsedTime() - lastShoot > FireRate) {
             sf::Vector2f dir = sf::Vector2f(sf::Mouse::getPosition());
@@ -117,7 +122,7 @@ public:
 // Shotgun
 class Shotgun : public Weapon {
 public:
-    Shotgun() : Weapon(5, 5, 1, 3) { velocity = 8; count = 10;  scatter = 50; NameText.setText("Shotgun"); }
+    Shotgun() : Weapon(5, 5, 1, 3) { velocity = 10; count = 10;  scatter = 50; NameText.setText("Shotgun"); }
     void Update(vB& Bullets, Rect& player, sf::Clock* clock, sf::Vector2f* camera) {
         if (!lock && ammunition.toBottom() != 0 && clock->getElapsedTime() - lastShoot > FireRate) {
             Shoot(Bullets, player, clock, camera);
@@ -135,7 +140,7 @@ public:
         RotateOn(-M_PI * scatter / float(180 * 2), dx, dy);
         for (int i = 0; i < count; i++, RotateOn(M_PI * scatter / float(180 * count), dx, dy)) {
             Bullet* newBullet = new Bullet(player.PosX + player.Width / 2, player.PosY + player.Height / 2, dx, dy,
-                                           sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7);
+                                           sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7, 0);
             Bullets.push_back(*newBullet);
             delete newBullet;
         }
@@ -147,7 +152,7 @@ public:
 // Rifle
 class Rifle : public Weapon {
 public:
-    Rifle() : Weapon(25, 1, 0.1, 2) { velocity = 8; count = 10;  scatter = 20; NameText.setText("Rifle"); }
+    Rifle() : Weapon(25, 1, 0.05, 2) { velocity = 16; count = 10;  scatter = 17; NameText.setText("Rifle"); }
     void Update(vB& Bullets, Rect& player, sf::Clock* clock, sf::Vector2f* camera) {
         if (!lock && ammunition.toBottom() != 0 && clock->getElapsedTime() - lastShoot > FireRate) {
             sf::Vector2f dir = sf::Vector2f(sf::Mouse::getPosition());
@@ -189,8 +194,8 @@ public:
         if (len == 0) return;
         RotateOn(-M_PI * (rand() % (int)scatter - scatter / 2) / 180, dx, dy);
         dx *= velocity / len; dy *= velocity / len;
-        BubblegunBullet* newBullet = new BubblegunBullet(player.PosX + player.Width / 2, player.PosY + player.Height / 2, dx, dy,
-                        sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7, 3 + clock->getElapsedTime().asSeconds());
+        Bullet* newBullet = new Bullet(player.PosX + player.Width / 2, player.PosY + player.Height / 2, dx, dy,
+sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7, 3 + clock->getElapsedTime().asSeconds(), BulletType::Bubble);
         Bullets.push_back(*newBullet);
         delete newBullet;
         ammunition -= 1;
@@ -219,7 +224,7 @@ public:
         float dx = 0, dy = velocity;
         RotateOn(float(-M_PI * count) / 12, dx, dy);
         Bullet* newBullet = new Bullet(player.PosX + player.Width / 2, player.PosY + player.Height / 2, dx, dy,
-                                       sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7);
+                                       sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7, 0);
         Bullets.push_back(*newBullet);
         delete newBullet;
         ammunition -= 1;
@@ -228,3 +233,24 @@ public:
     }
 };
 
+// Chaotic
+class Chaotic : public Weapon {
+public:
+    Chaotic() : Weapon(300, 0.1, 1.f / 16, 3) { velocity = 3; NameText.setText("Chaotic"); }
+    void Update(vB& Bullets, Rect& player, sf::Clock* clock, sf::Vector2f* camera) {
+        if (!lock && ammunition.toBottom() != 0 && clock->getElapsedTime() - lastShoot > FireRate)
+            Shoot(Bullets, player, clock, camera);
+        else if (ammunition.toBottom() == 0)
+            lock = true;
+    }
+    void Shoot(vB& Bullets, Rect& player, sf::Clock* clock, sf::Vector2f* camera) {
+        float dx = 0, dy = velocity;
+        RotateOn(float(rand()), dx, dy);
+        Bullet* newBullet = new Bullet(player.PosX + player.Width / 2, player.PosY + player.Height / 2, dx, dy,
+                                       sf::Color(rand() % 256, rand() % 256, rand() % 256), 1, damage, 7, 0);
+        Bullets.push_back(*newBullet);
+        delete newBullet;
+        ammunition -= 1;
+        lastShoot = clock->getElapsedTime();
+    }
+};

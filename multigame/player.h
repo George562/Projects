@@ -6,7 +6,7 @@
 
 class Player : public Creature {
 public:
-    sf::RectangleShape ManaRect[3], HpRect[3];
+    Bar<float> ManaBar, HpBar;
     PlaccedText HpText, ManaText;
     bool ShiftPressed;
 
@@ -25,13 +25,13 @@ public:
 ////////////////////////////////////////////////////////////
 
 Player::Player() : Creature() {
-    Health = {0, 10, 10};
-    Mana = {0, 75, 75}; ManaRecovery = 0.5;
+    Health = {0, 10, 5};
+    Mana = {0, 75, 75}; ManaRecovery = 10.5;
     Armor = {0, 0, 0};
     Money = 0;
     radius = 60;
     Width = Height = radius * 2;
-    PosX = 0; PosY = 0; Velocity = {{-6, -6}, {6, 6}, {0, 0}}, Acceleration = 0.6;
+    PosX = 0; PosY = 0; Velocity = {{-6, -6}, {6, 6}, {0, 0}}, Acceleration = 0.6 * 2;
     ShiftPressed = false;
     LastCheck = sf::Clock().getElapsedTime();
     circle.setRadius(radius);
@@ -41,42 +41,28 @@ Player::Player() : Creature() {
     circle.setOutlineThickness(Velocity.cur.x);
     SetTexture("sources/Player");
 
-    HpRect[0].setSize({360, 60});
-    HpRect[1].setSize({350, 50});
-    HpRect[0].setPosition(scw - HpRect[0].getSize().x - 10, 20);
-    HpRect[1].setPosition(HpRect[0].getPosition().x + 5, HpRect[0].getPosition().y + 5);
-    HpRect[0].setFillColor(sf::Color(255, 255, 255, 160));
-    HpRect[1].setFillColor(sf::Color(192, 0, 0, 160));
-
-    HpRect[2] = HpRect[1];
-    HpRect[2].setFillColor(sf::Color(32, 32, 32, 160));
-
-    ManaRect[0].setSize({240, 50});
-    ManaRect[1].setSize({230, 40});
-    ManaRect[0].setPosition(scw - ManaRect[0].getSize().x - 10, HpRect[0].getPosition().y + HpRect[0].getSize().y - 5);
-    ManaRect[1].setPosition(ManaRect[0].getPosition().x + 5, ManaRect[0].getPosition().y + 5);
-    ManaRect[0].setFillColor(sf::Color(255, 255, 255, 160));
-    ManaRect[1].setFillColor(sf::Color(0, 0, 192, 160));
-
-    ManaRect[2] = ManaRect[1];
-    ManaRect[2].setFillColor(sf::Color(32, 32, 32, 160));
+    HpBar.setSize(360, 60);
+    HpBar.setPosition(scw - HpBar.getSize().x - 10, 20);
+    HpBar.scale = &Health;
+    HpBar.setColors(sf::Color(255, 255, 255, 160), sf::Color(192, 0, 0, 160), sf::Color(32, 32, 32, 160));
+    
+    ManaBar.setSize(240, 50);
+    ManaBar.setPosition(scw - ManaBar.getSize().x - 10, HpBar.getPosition().y + HpBar.getSize().y - 5);
+    ManaBar.scale = &Mana;
+    ManaBar.setColors(sf::Color(255, 255, 255, 160), sf::Color(0, 0, 192, 160), sf::Color(32, 32, 32, 160));
 }
 
 void Player::interface(sf::RenderWindow& window) {
     HpText.setText(std::to_string((int)Health.cur));
-    HpText.setPosition(HpRect[0].getPosition().x + HpRect[0].getSize().x / 2 - HpText.Width  / 2,
-                       HpRect[0].getPosition().y + HpRect[0].getSize().y / 2 - HpText.Height / 2);
-    HpRect[1].setScale(Health.filling(), 1);
+    HpText.setPosition(HpBar.getPosition().x + HpBar.getSize().x / 2 - HpText.Width  / 2,
+                       HpBar.getPosition().y + HpBar.getSize().y / 2 - HpText.Height / 2);
     ManaText.setText(std::to_string((int)Mana.cur));
-    ManaText.setPosition(ManaRect[0].getPosition().x + ManaRect[0].getSize().x / 2 - ManaText.Width  / 2,
-                       ManaRect[0].getPosition().y + ManaRect[0].getSize().y / 2 - ManaText.Height / 2);
-    ManaRect[1].setScale(Mana.filling(), 1);
-    window.draw(HpRect[0]);
-    window.draw(HpRect[2]);
-    window.draw(HpRect[1]);
-    window.draw(ManaRect[0]);
-    window.draw(ManaRect[2]);
-    window.draw(ManaRect[1]);
+    ManaText.setPosition(ManaBar.getPosition().x + ManaBar.getSize().x / 2 - ManaText.Width  / 2,
+                       ManaBar.getPosition().y + ManaBar.getSize().y / 2 - ManaText.Height / 2);
+
+    HpBar.draw(window);
+    ManaBar.draw(window);
+
     HpText.draw(window);
     ManaText.draw(window);
     CurWeapon->interface(window);

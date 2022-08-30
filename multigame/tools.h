@@ -15,7 +15,15 @@
 #include <thread>
 #include <chrono>
 #include "scale.h"
+#include "textures.h"
 #define M_PI       3.14159265358979323846   // pi
+
+namespace LocationIdex {
+    unsigned short int nothing = 0;
+    unsigned short int wall = 1;
+    unsigned short int box = 2;
+}
+
 using Point = sf::Vector2i;
 using vp = std::vector<Point>;
 using vvp = std::vector<vp>;
@@ -35,6 +43,9 @@ struct Circle { float PosX, PosY, Radius; };
 using str = std::string;
 using vb = std::vector<bool>;
 using vvb = std::vector<vb>;
+
+using vu = std::vector<unsigned short int>;
+using location = std::vector<vu>;
 
 Point dirs[] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
@@ -85,11 +96,13 @@ bool in(const float ax, const float ay, const float& x, const float& y, const fl
 
 // {x = 1, y = -1} => collision at the y, up or down doesn't matter, because u know "dy" already
 sf::Vector2i WillCollisionWithWalls(vvr Walls, int& size, float& PosX, float& PosY, float& Width, float& Height, float& dx, float& dy) {
+    sf::Vector2i res = {-1, -1};
     int y = (int(PosY) / size) * 2, x = (int(PosX) / size) * 2;
     int BigN = Walls.size(), BigM = Walls[0].size();
+    if (0 > y || y > BigN || 0 > x || x > BigM) return res;
+
     float nextX = PosX + dx, nextY = PosY + dy;
 
-    sf::Vector2i res = {-1, -1};
     if (dy < 0) {
         if ((y <= 0 || !in(Walls[y - 1][x],        PosX, nextY, Width, Height)) &&
             (!in(Walls[y][x + 1],                  PosX, nextY, Width, Height)) &&
@@ -121,7 +134,7 @@ sf::Vector2i WillCollisionWithWalls(vvr Walls, int& size, float& PosX, float& Po
     return res;  // if value of vector == -1 => there was collision
 }
 
-void find_ways(vp& arr, vvb& walls, const int x, const int y, const int n, const int m) {
+void find_ways(vp& arr, location& walls, const int x, const int y, const int n, const int m) {
     arr.clear();
     vvb used(n, vb(m, false));
     std::queue<Point> q; q.push(Point{x, y});
@@ -157,21 +170,21 @@ void find_ways(vp& arr, vvb& walls, const int x, const int y, const int n, const
         }
 }
 
-void generation(vvb& arr, int& n, int& m, float probability) {
+void generation(location& arr, int& n, int& m, float probability) {
     int N = n * 2, M = m * 2;
-    arr.assign(N + 1, vb(M + 1, false));
+    arr.assign(N + 1, vu(M + 1, 0));
 
-    for (int j = 1; j < M; j += 2) arr[0][j] = true;
+    for (int j = 1; j < M; j += 2) arr[0][j] = 1;
 
     for (int i = 1; i < N; i++) {
-        if (i % 2 == 1) arr[i][0] = true;
+        if (i % 2 == 1) arr[i][0] = 1;
         for (int j = 1 + i % 2; j < M; j += 2)
             if (float(rand() % 100) / 100 < probability)
-                arr[i][j] = true;
-        if (i % 2 == 1) arr[i][M] = true;
+                arr[i][j] = 1;
+        if (i % 2 == 1) arr[i][M] = 1;
     }
 
-    for (int j = 1; j < M; j += 2) arr[N][j] = true;
+    for (int j = 1; j < M; j += 2) arr[N][j] = 1;
 }
 
 void RotateOn(float phi, float& x, float& y) {
@@ -196,6 +209,41 @@ sf::Vector2f RotateAround(float phi, sf::Vector2f& a, float& X, float& Y) {
     newA.x =   (a.x - X) * cos(phi) + (a.y - Y) * sin(phi) + X;
     newA.y = - (a.x - X) * sin(phi) + (a.y - Y) * cos(phi) + Y;
     return newA;
+}
+
+void LoadLocation(location& arr, vvr& wallsRect, std::vector<sf::Sprite>& Sprites, int& size, float& minisize, str FileName) {
+    std::ifstream file(FileName);
+    int n, m; file >> n >> m;
+    arr.assign(n, vu(m, 0));
+    bool temp;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            file >> arr[i][j];
+        }
+    }
+    file.close();
+    Sprites.clear();
+    wallsRect.assign(n, vr(m));
+    for (int i = 0; i <= n * 2; i++)
+        for (int j = 0; j <= m * 2; j++) {
+            if (arr[i][j] == LocationIdex::wall) {
+                if (i % 2 == 1) // |
+                    wallsRect[i][j] = {(size * j - minisize) / 2, size * (i - 1) / 2.f, minisize, float(size)};
+                else // -
+                    wallsRect[i][j] = {size * (j - 1) / 2.f, (size * i - minisize) / 2, float(size), minisize};
+            } else  {
+                wallsRect[i][j] = {-1, -1, -1, -1};
+                if (arr[i][j] == LocationIdex::box) {
+                    sf::Texture* tempTexture = new sf::Texture;
+                    tempTexture->loadFromFile("sources/Box.png");
+                    sf::Sprite* tempSprite = new sf::Sprite;
+                    tempSprite->setTexture(*tempTexture);
+                    tempSprite->setScale(250 / tempSprite->getGlobalBounds().width, 250 / tempSprite->getGlobalBounds().height);
+                    tempSprite->setPosition(size * j / 2, size * i / 2);
+                    Sprites.push_back(*tempSprite);
+                }
+            }
+        }
 }
 
 Rect& operator+=(Rect& a, Point& b) { a.PosX += b.x; a.PosY += b.y; return a; } // summ position

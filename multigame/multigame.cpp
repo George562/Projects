@@ -45,8 +45,11 @@ int size = 540, miniSize = 50, n = 15, m = 15; // map is matrix m*m cells with s
 bool MiniMapActivated;
 sf::Vector2f CameraPos(0, 0), miniCameraPos((scw - m * miniSize) / 2, (sch - n * miniSize) / 2);
 float WallMinSize = size / 8, WallMaxSize = size;
-vvb walls(0);
+location LabirintWalls(0);
+location WaitingRoomWalls(0);
 vvr wallsRect(0);
+std::vector<sf::Sprite> Sprites(0);
+sf::Sprite tempSprite;
 vp ways(0);
 sf::RectangleShape WallRectG(sf::Vector2f(WallMaxSize, WallMinSize));
 sf::RectangleShape WallRectV(sf::Vector2f(WallMinSize, WallMaxSize));
@@ -64,7 +67,6 @@ Point tempPoint;
 sf::Vector2i MouseBuffer;
 sf::CircleShape BulletShape;
 vB Bullets(0);
-vBB BubblegunBullets(0);
 Bullet tempBullet;
 
 // sfe::Movie flame;
@@ -83,6 +85,10 @@ void drawWalls();
 
 //////////////////////////////////////////////////////////// the program
 int main() {
+    setlocale(LC_ALL, "rus");
+
+    LoadAllTextures();
+
     window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
     settings.antialiasingLevel = 8;
@@ -95,8 +101,6 @@ int main() {
 
     TextFPS.text.setPosition(20, 20);
     TextFPS.text.setFillColor(sf::Color(255, 255, 255));
-
-    BulletShape.setRadius(7);
 
     setlocale(LC_ALL, "rus");
     listener.setBlocking(false);
@@ -129,7 +133,7 @@ int main() {
     sf::Thread HostTread(funcOfHost);
     sf::Thread ClientTread(funcOfClient);
 
-    walls.assign(BigN, vb(BigM, false));
+    LabirintWalls.assign(BigN, vu(BigM, 0));
     wallsRect.assign(BigN, vr(BigM, {-1, -1, -1, -1}));
 
     Pistol pistol;
@@ -138,6 +142,7 @@ int main() {
     Rifle rifle;
     Bubblegun bubblegun;
     Armagedon armagedon;
+    Chaotic chaotic;
     player.FirstWeapon  = &pistol;
     player.SecondWeapon = &shotgun;
     player.CurWeapon = player.FirstWeapon;
@@ -154,12 +159,13 @@ int main() {
                 mutex.unlock();
             }
             player.update(Bullets);
-            for (int i = 0; i < Bullets.size(); i++) {
+            for (int i = 0; i < Bullets.size();) {
                 int y = (int(Bullets[i].PosY) / size) * 2, x = (int(Bullets[i].PosX) / size) * 2;
-                if (!(0 <= x && x < BigM && 0 <= y && y < BigN) || Bullets[i].penetration < 0) {
-                    Bullets.erase(Bullets.begin() + i--); continue;
+                if (!(0 <= x && x < BigM && 0 <= y && y < BigN) || Bullets[i].penetration < 0 || Bullets[i].todel) {
+                    Bullets.erase(Bullets.begin() + i); continue;
+                    std::cout << "bruh\n";
                 }
-                Bullets[i].move(wallsRect, size, clock);
+                Bullets[i++].move(wallsRect, size, clock);
             }
             while (window.pollEvent(event)) {}
             draw();
@@ -183,9 +189,9 @@ int main() {
                     mutex.unlock();
                 }
                 for (int i = 0; i < Bullets.size(); i++) {
-                    float radius = BulletShape.getRadius();
+                    float radius = Bullets[i].circle->getRadius();
                     int y = (int(Bullets[i].PosY) / size) * 2, x = (int(Bullets[i].PosX) / size) * 2;
-                    if (!(0 <= x && x < BigM && 0 <= y && y < BigN)) {
+                    if (!(0 <= x && x < BigM && 0 <= y && y < BigN) || Bullets[i].penetration < 0 || Bullets[i].todel) {
                         Bullets.erase(Bullets.begin() + i--); continue;
                     }
                     Bullets[i].move(wallsRect, size, clock);
@@ -283,6 +289,7 @@ int main() {
                         else if (event.key.code == sf::Keyboard::Num4) player.ChangeWeapon(&rifle);
                         else if (event.key.code == sf::Keyboard::Num5) player.ChangeWeapon(&bubblegun);
                         else if (event.key.code == sf::Keyboard::Num6) player.ChangeWeapon(&armagedon);
+                        else if (event.key.code == sf::Keyboard::Num7) player.ChangeWeapon(&chaotic);
                     } else if (event.type == sf::Event::MouseWheelMoved) {
                         if (MiniMapActivated) {
                             if (event.mouseWheel.delta < 0) { MiniMapView.zoom(1.1f); MiniMapZoom *= 1.1f; }
@@ -413,6 +420,7 @@ int main() {
                         else if (event.key.code == sf::Keyboard::Num4) player.ChangeWeapon(&rifle);
                         else if (event.key.code == sf::Keyboard::Num5) player.ChangeWeapon(&bubblegun);
                         else if (event.key.code == sf::Keyboard::Num6) player.ChangeWeapon(&armagedon);
+                        else if (event.key.code == sf::Keyboard::Num7) player.ChangeWeapon(&chaotic);
                     } else if (event.type == sf::Event::MouseWheelMoved) {
                         if (MiniMapActivated) {
                             if (event.mouseWheel.delta < 0) { MiniMapView.zoom(1.1f); MiniMapZoom *= 1.1f; }
@@ -438,6 +446,13 @@ int main() {
                             else screen = screens::EscOfCoop;
                         else if (event.key.code == sf::Keyboard::Enter)
                             chat.Enterred();
+                        else if (event.key.code == sf::Keyboard::H) {
+                            LoadLocation(LabirintWalls, wallsRect, Sprites, size, WallMinSize, "sources/locations/WaitingRoom.txt");
+                            n = LabirintWalls.size() / 2;
+                            m = LabirintWalls[0].size() / 2;
+                            player.setPosition(size, size);
+                            std::cout << "bruh!\n";
+                        }
                         else if (event.key.code == sf::Keyboard::Tab) MiniMapActivated = !MiniMapActivated;
                         else if (event.key.code == sf::Keyboard::Num1) player.ChangeWeapon(&pistol);
                         else if (event.key.code == sf::Keyboard::Num2) player.ChangeWeapon(&shotgun);
@@ -445,6 +460,7 @@ int main() {
                         else if (event.key.code == sf::Keyboard::Num4) player.ChangeWeapon(&rifle);
                         else if (event.key.code == sf::Keyboard::Num5) player.ChangeWeapon(&bubblegun);
                         else if (event.key.code == sf::Keyboard::Num6) player.ChangeWeapon(&armagedon);
+                        else if (event.key.code == sf::Keyboard::Num7) player.ChangeWeapon(&chaotic);
                     } else if (event.type == sf::Event::MouseWheelMoved) {
                         if (MiniMapActivated) {
                             if (event.mouseWheel.delta < 0) { MiniMapView.zoom(1.1f); MiniMapZoom *= 1.1f; }
@@ -478,6 +494,18 @@ void draw() {
         window.clear(sf::Color::Black);
         drawWalls();
         if (!MiniMapActivated) {
+            for (sf::Sprite& s: Sprites) {
+                sf::FloatRect fr = s.getGlobalBounds();
+                if (in({fr.left, fr.top, fr.width, fr.height}, CameraPos.x, CameraPos.x, scw, sch)) {
+                    s.setPosition(s.getPosition() - CameraPos);
+                            // std::cout << "bruh\n";
+                    window.draw(s);
+                            // std::cout << "bruh\n";
+                    s.setPosition(s.getPosition() + CameraPos);
+                            // std::cout << "bruh\n";
+                }
+            }
+                            // std::cout << "bruh\n";
             player.draw(window);
             for (int i = 0; i < Bullets.size(); i++)
                 Bullets[i].draw(window, CameraPos);
@@ -499,6 +527,14 @@ void draw() {
         drawWalls();
         for (Player& p: ConnectedPlayers)
             if (!MiniMapActivated) {
+                for (sf::Sprite& s: Sprites) {
+                    sf::FloatRect fr = s.getGlobalBounds();
+                    if (in({fr.left, fr.top, fr.width, fr.height}, CameraPos.x, CameraPos.x, scw, sch)) {
+                        s.setPosition(s.getPosition() - CameraPos);
+                        window.draw(s);
+                        s.setPosition(s.getPosition() + CameraPos);
+                    }
+                }
                 p.draw(window);
                 for (int i = 0; i < Bullets.size(); i++)
                     Bullets[i].draw(window, CameraPos);
@@ -516,11 +552,19 @@ void draw() {
         drawWalls();
         for (Player& p: ConnectedPlayers)
             if (!MiniMapActivated) {
-                window.setView(MiniMapView);
+                for (sf::Sprite& s: Sprites) {
+                    sf::FloatRect fr = s.getGlobalBounds();
+                    if (in({fr.left, fr.top, fr.width, fr.height}, CameraPos.x, CameraPos.x, scw, sch)) {
+                        s.setPosition(s.getPosition() - CameraPos);
+                        window.draw(s);
+                        s.setPosition(s.getPosition() + CameraPos);
+                    }
+                }
+                // window.setView(MiniMapView);
                 p.draw(window);
                 for (int i = 0; i < Bullets.size(); i++)
                     Bullets[i].draw(window, CameraPos);
-                window.setView(GameView);
+                // window.setView(GameView);
             } else {
                 CircleOfSmallPlayer.setPosition(p.getPosition() / float(size) * float(miniSize) + miniCameraPos);
                 window.draw(CircleOfSmallPlayer);
@@ -532,9 +576,17 @@ void draw() {
         window.clear(sf::Color::Black);
         drawWalls();
         for (Player& p: ConnectedPlayers)
-            if (!MiniMapActivated)
+            if (!MiniMapActivated) {
+                for (sf::Sprite& s: Sprites) {
+                    sf::FloatRect fr = s.getGlobalBounds();
+                    if (in({fr.left, fr.top, fr.width, fr.height}, CameraPos.x, CameraPos.x, scw, sch)) {
+                        s.setPosition(s.getPosition() - CameraPos);
+                        window.draw(s);
+                        s.setPosition(s.getPosition() + CameraPos);
+                    }
+                }
                 p.draw(window);
-            else {
+            } else {
                 CircleOfSmallPlayer.setPosition(p.getPosition() / float(size) * float(miniSize) + miniCameraPos);
                 window.draw(CircleOfSmallPlayer);
             }
@@ -721,13 +773,13 @@ void funcOfClient() {
                         std::cout << "Labirint receiving\n";
                         ReceivePacket >> n >> m;
                         std::cout << "n = " << n << " m = " << m << '\n';
-                        walls.assign(BigN, vb(BigM, false));
+                        LabirintWalls.assign(BigN, vu(BigM, 0));
                         wallsRect.assign(BigN, vr(BigM, {-1, -1, -1, -1}));
                         bool tempBool;
                         for (int i = 0; i <= n * 2; i++)
                             for (int j = 0; j <= m * 2; j++) {
-                                ReceivePacket >> tempBool; walls[i][j] = tempBool;
-                                if (walls[i][j]) {
+                                ReceivePacket >> tempBool; LabirintWalls[i][j] = tempBool;
+                                if (LabirintWalls[i][j]) {
                                     if (i % 2 == 1) // |
                                         wallsRect[i][j] = {(size * j - WallMinSize) / 2, size * (i - 1) / 2.f, WallMinSize, float(size)};
                                     else // -
@@ -771,19 +823,26 @@ void LevelGenerate() {
     LabirintData << pacetStates::Labirint << n << m;
     player.setPosition({float(m - m % 2 + 1) * size / 2, float(n - n % 2 + 1) * size / 2});
     do {
-        generation(walls, n, m, 0.48);
-        find_ways(ways, walls, m - m % 2 + 1, n - n % 2 + 1, n, m);
+        generation(LabirintWalls, n, m, 0.48);
+        find_ways(ways, LabirintWalls, m - m % 2 + 1, n - n % 2 + 1, n, m);
     } while (ways.size() < float(n * m) / 3 || ways.size() > float(n * m) / 1.5);
     wallsRect.assign(BigN, vr(BigM));
     for (int i = 0; i <= n * 2; i++)
         for (int j = 0; j <= m * 2; j++) {
-            if (walls[i][j]) {
+            if (LabirintWalls[i][j] == LocationIdex::wall) {
                 if (i % 2 == 1) // |
                     wallsRect[i][j] = {(size * j - WallMinSize) / 2, size * (i - 1) / 2.f, WallMinSize, float(size)};
                 else // -
                     wallsRect[i][j] = {size * (j - 1) / 2.f, (size * i - WallMinSize) / 2, float(size), WallMinSize};
-            } else wallsRect[i][j] = {-1, -1, -1, -1};
-            LabirintData << walls[i][j];
+            } else  {
+                wallsRect[i][j] = {-1, -1, -1, -1};
+                if (LabirintWalls[i][j] == LocationIdex::box) {
+                    tempSprite.setTexture(Box);
+                    tempSprite.setPosition(size * j / 2, size * i / 2);
+                    Sprites.push_back(tempSprite);
+                }
+            }
+            LabirintData << LabirintWalls[i][j];
         }
 }
 
@@ -793,7 +852,7 @@ void drawWalls() {
                 i <= std::min(2 * n, 2 * int(CameraPos.y + sch + WallMinSize) / size + 1); i++)
             for (int j = std::max(0, 2 * int(CameraPos.x) / size - 1);
                     j <= std::min(2 * m, 2 * int(CameraPos.x + scw + WallMinSize) / size + 1); j++)
-                if (walls[i][j])
+                if (LabirintWalls[i][j] == LocationIdex::wall)
                     if (i % 2 == 1) { // |
                         WallRectV.setPosition(sf::Vector2f(wallsRect[i][j].PosX, wallsRect[i][j].PosY) - CameraPos);
                         window.draw(WallRectV);
@@ -805,7 +864,7 @@ void drawWalls() {
         window.setView(MiniMapView);
         for (int i = 0; i <= n * 2; i++)
             for (int j = 0; j <= m * 2; j++)
-                if (walls[i][j])
+                if (LabirintWalls[i][j] == LocationIdex::wall)
                     if (i % 2 == 1) { // |
                     sf::Vertex line[2] = {
                         sf::Vertex(sf::Vector2f((miniSize * j) / 2, miniSize * (i - 1) / 2) + miniCameraPos),

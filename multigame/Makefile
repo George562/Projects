@@ -24,8 +24,11 @@ player.h.gch: player.h creature.h.gch
 creature.h.gch: creature.h weapon.h.gch
 	$(CC) creature.h -O3
 
-weapon.h.gch: weapon.h bullet.h.gch
+weapon.h.gch: weapon.h bullet.h.gch Bar.h.gch
 	$(CC) weapon.h -O3
+
+Bar.h.gch: Bar.h
+	$(CC) Bar.h -O3
 
 bullet.h.gch: bullet.h text.h.gch
 	$(CC) bullet.h -O3
