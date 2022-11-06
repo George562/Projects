@@ -17,17 +17,44 @@ using vvf = std::vector<std::vector<float>>;
 /* ToDo:
     прогресс сбора кубика:
         этапы прогресса по€вл€ютс€ постепенно, после завершени€ предыдущего
-        пройденные этапы вывод€тс€ зелЄным текстом, текущий - жЄлтым
-        этапы:
-            собрать на передней грани белый крест   доступен пиф-паф
-            собрать белую грань                     без изменений
-            собрать второй слой кубика              доступен левый пиф-паф
-            собрать крест последнего сло€           доступен палга и галка
-            собрать последнюю сторону               
-            расставить рЄбра                        
-            расставить углы                         
+        пройденные этапы вывод€тс€ зелЄным текстом, текущий - жЄлтым                       
         с каждым этапом открываютс€ новые комбинации комманд
 */
+
+enum Stage {          // этапы:
+    white_cross,      //    собрать на передней грани белый крест   доступен пиф-паф
+    white_face,       //    собрать белую грань                     без изменений
+    second_layer,     //    собрать второй слой кубика              доступен левый пиф-паф
+    last_layer_cross, //    собрать крест последнего сло€           доступен палга и галка
+    last_face,        //    собрать последнюю сторону               
+    set_edges,        //    расставить рЄбра                        
+    set_corners,      //    расставить углы                         
+    done              //    кубик собран. этап не отображаетс€ пользователю
+};
+int curStage = white_cross;
+// функции проверки выполнени€ стадии
+bool white_cross_is_done();
+bool white_face_is_done();
+bool second_layer_is_done();
+bool last_layer_cross_is_done();
+bool last_face_is_done();
+bool set_edges_is_done();
+bool set_corners_is_done();
+void which_stage() {                                   curStage = white_cross;
+    if (white_cross_is_done()) {                       curStage = white_face;
+        if (white_face_is_done()) {                    curStage = second_layer;
+            if (second_layer_is_done()) {              curStage = last_layer_cross;
+                if (last_layer_cross_is_done()) {      curStage = last_face;
+                    if (last_face_is_done()) {         curStage = set_edges;
+                        if (set_edges_is_done()) {     curStage = set_corners;
+                            if (set_corners_is_done()) curStage = done;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 int random(int min, int max) { return abs(rand() % (max - min + 1)) + min; } // случайное число в диапазоне [min, max]
 
@@ -59,15 +86,15 @@ GLfloat aV[kV][3] = { {a,-a,-a}, {-a,-a,-a}, {-a,-a, a}, {a,-a, a},     // нижни
 int mG[kG][4] = { {0, 3, 2, 1}, {4, 5, 6, 7}, {2, 3, 7, 6},             // 0-нижн.грань, 1-верхн€€, 2-передн€€
                   {0, 4, 7, 3}, {0, 1, 5, 4}, {1, 2, 6, 5} };           // 3-права€, 4-задн€€, 5-лева€
 
-float mColor0[kG][3] = { {1.0, 1.0, 0.0}, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0},
-                           {0.0, 0.0, 1.0}, {1.0, 0.4, 0.0}, {0.0, 1.0, 0.0} };
+float mColor0[kG][3] = { {1.0, 1.0, 0.0}, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0},     // жЄлтый,     белый, красный
+                           {0.0, 0.0, 1.0}, {1.0, 0.4, 0.0}, {0.0, 1.0, 0.0} }; //  синий, оранжевый, зелЄный
 std::map<vf, int> mappingColors {
-    {vf(mColor0[0], mColor0[0] + 3), 0},
-    {vf(mColor0[1], mColor0[1] + 3), 1},
-    {vf(mColor0[2], mColor0[2] + 3), 2},
-    {vf(mColor0[3], mColor0[3] + 3), 3},
-    {vf(mColor0[4], mColor0[4] + 3), 4},
-    {vf(mColor0[5], mColor0[5] + 3), 5}
+    {vf(mColor0[0], mColor0[0] + 3), 0}, // жЄлтый
+    {vf(mColor0[1], mColor0[1] + 3), 1}, // белый
+    {vf(mColor0[2], mColor0[2] + 3), 2}, // красный
+    {vf(mColor0[3], mColor0[3] + 3), 3}, // синий
+    {vf(mColor0[4], mColor0[4] + 3), 4}, // оранжевый
+    {vf(mColor0[5], mColor0[5] + 3), 5}  // зелЄный
 };
 struct cubic {
     float x, y, z; // координаты центра
@@ -197,7 +224,7 @@ void renderBitmapString(float x, float y, void *font, str string) {
  
 void renderScene(void) {
     //очистить буфер цвета и глубины
-    glClearColor(0.82f, 0.7f, 0.5f, 0.6f); // бежевый фон
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f); // бежевый фон
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // обнулить трансформацию
     glLoadIdentity();
@@ -253,7 +280,7 @@ void renderScene(void) {
         glVertex3f(-2, -15, -8);
     glEnd();
 
-    glColor3f(0.F, 0.F, 0.F);
+    glColor3f(0.8F, 0.8F, 0.8F);
     renderBitmapString(-12, 7, (void *)font, "Esc - exit");
     renderBitmapString(-12, 6, (void *)font, "Space - solve it");
     renderBitmapString(-12, 5, (void *)font, "Enter - shuffle " + std::to_string(shuffleNumber) + " times");
@@ -262,6 +289,34 @@ void renderScene(void) {
     renderBitmapString(0, 0, (void *)font, "Combins:");
     for (int i = 1; i <= combins.size(); i++)
         renderBitmapString(0, - i * 0.8, (void *)font, makeStrComm(i));
+    
+
+    renderBitmapString(-1, 10 * 0.7, (void *)font, "stage:");
+    glColor3f(1.F, 1.F, 0.F);
+    switch (curStage) {
+        case done:
+            glColor3f(0.F, 0.8F, 0.F);
+        case set_corners:
+            renderBitmapString(0, 3 * 0.7, (void *)font, "set corners");
+            glColor3f(0.F, 0.8F, 0.F);
+        case set_edges:
+            renderBitmapString(0, 4 * 0.7, (void *)font, "set edges");
+            glColor3f(0.F, 0.8F, 0.F);
+        case last_face:
+            renderBitmapString(0, 5 * 0.7, (void *)font, "last face");
+            glColor3f(0.F, 0.8F, 0.F);
+        case last_layer_cross:
+            renderBitmapString(0, 6 * 0.7, (void *)font, "last layer cross");
+            glColor3f(0.F, 0.8F, 0.F);
+        case second_layer:
+            renderBitmapString(0, 7 * 0.7, (void *)font, "second layer");
+            glColor3f(0.F, 0.8F, 0.F);
+        case white_face:
+            renderBitmapString(0, 8 * 0.7, (void *)font, "white face");
+            glColor3f(0.F, 0.8F, 0.F);
+        case white_cross:
+            renderBitmapString(0, 9 * 0.7, (void *)font, "white cross");
+    }
 
     glutSwapBuffers();
 }
@@ -300,6 +355,7 @@ void processNormalKeys(unsigned char symbol, int xx, int yy) {
     }
     key = symbol;
     SaveCube();
+    which_stage();
 }
 
 void pressKey(int key, int xx, int yy) {
@@ -321,6 +377,7 @@ void pressKey(int key, int xx, int yy) {
     }
     key0 = key;
     SaveCube();
+    which_stage();
 }
 
 // ------------------------------------//
@@ -392,6 +449,7 @@ int main(int argc, char **argv) {
     initv();
     LoadCube();
     loadCombins();
+    which_stage();
     // инициализаци€ Glut и создание окна
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_STENCIL);
@@ -532,11 +590,9 @@ void showG(int j, int i1, int i2, int i3, int i4, int k0) {
     glPopMatrix();
 }
 void showCube() {
-    for (int j = 0; j < kk; j++) { // по кубиками  с центрами в mcub[ii][0-3]
-        for (int i = 0; i < kG; i++) {  // отрисовка граней: цвета mCol[0], mCol[1], ... 
+    for (int j = 0; j < kk; j++) // по кубиками  с центрами в mcub[ii][0-3]
+        for (int i = 0; i < kG; i++)  // отрисовка граней: цвета mCol[0], mCol[1], ... 
             showG(j, mG[i][0], mG[i][1], mG[i][2], mG[i][3], i); // 
-        }
-    }
 }
 
 void showCubeG(unsigned char key) {
@@ -546,9 +602,8 @@ void showCubeG(unsigned char key) {
         if ((key == 'r' || key == 'e') && mcub[j].x !=  2 * a) continue; //  R E 
         if ((key == 'l' || key == 'k') && mcub[j].x != -2 * a) continue; //  L K 
         if ((key == 'd' || key == 's') && mcub[j].y != -2 * a) continue; //  D S 
-        for (int i = 0; i < kG; i++) {  // отрисовка поворачиваемой грани : с учетом лок.поворота
+        for (int i = 0; i < kG; i++)  // отрисовка поворачиваемой грани : с учетом лок.поворота
             showG(j, mG[i][0], mG[i][1], mG[i][2], mG[i][3], i); // 
-        }
     }
     glPopMatrix();
     for (int j = 0; j < kk; j++) { // неподвижна€ часть
@@ -652,4 +707,34 @@ void LoadCube() {
                 mcub[i].mCol[j][1] = mColor0[colorNum][1];
                 mcub[i].mCol[j][2] = mColor0[colorNum][2];
             }
+}
+
+// функции проверки выполнени€ стадии
+bool white_cross_is_done() {
+    bool res = false;
+    return res;
+}
+bool white_face_is_done() {
+    bool res = false;
+    return res;
+}
+bool second_layer_is_done() {
+    bool res = false;
+    return res;
+}
+bool last_layer_cross_is_done() {
+    bool res = false;
+    return res;
+}
+bool last_face_is_done() {
+    bool res = false;
+    return res;
+}
+bool set_edges_is_done() {
+    bool res = false;
+    return res;
+}
+bool set_corners_is_done() {
+    bool res = false;
+    return res;
 }
