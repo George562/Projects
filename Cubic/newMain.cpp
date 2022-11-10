@@ -96,6 +96,11 @@ std::map<vf, int> mappingColors {
     {vf(mColor0[4], mColor0[4] + 3), 4}, // оранжевый
     {vf(mColor0[5], mColor0[5] + 3), 5}  // зелЄный
 };
+std::map<int, str> stringColors { {0, "yellow"}, {1, "white"}, {2, "red"}, {3, "blue"}, {4, "orange"}, {5, "green"} };
+
+vf CurDirWhite {0, 1, 0, 0, 0, 0}; // на какой грани сейчас расположен белый центр
+vf CurDirRed {0, 0, 1, 0, 0, 0};   // на какой грани сейчас расположен красный центр
+
 struct cubic {
     float x, y, z; // координаты центра
     // цвета циклически мен€ютс€ после поворота
@@ -265,6 +270,7 @@ void renderScene(void) {
         bool err = contr(); // проверка корректности граней
         if (!err)
             err = false;
+        white_cross_is_done();
     }
     
     glLoadIdentity();
@@ -712,10 +718,24 @@ void LoadCube() {
 // функции проверки выполнени€ стадии
 bool white_cross_is_done() {
     bool res = false;
+
+    vf cubics {7, 15, 17, 25};
+    for (int i: cubics) {
+        vf vectorColor {mcub[i].mCol[1], mcub[i].mCol[1] + 3};
+        std::cout << i << " - " << stringColors[mappingColors[vectorColor]] << "\n";
+    } std::cout << '\n';
+
     return res;
 }
 bool white_face_is_done() {
     bool res = false;
+
+    vf cubics {6, 8, 16, 24, 26};
+    for (int i: cubics) {
+        vf vectorColor {mcub[i].mCol[1], mcub[i].mCol[1] + 3};
+        std::cout << i << " - " << stringColors[mappingColors[vectorColor]] << "\n";
+    } std::cout << '\n';
+    
     return res;
 }
 bool second_layer_is_done() {
