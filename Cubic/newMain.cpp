@@ -337,6 +337,8 @@ void renderScene(void) {
             float tempColor = CurDirColors[SideChange[i0][1]];
             for (int i = 1; i < 4; i++) CurDirColors[SideChange[i0][i]] = CurDirColors[SideChange[i0][i + 1]];
             CurDirColors[SideChange[i0][4]] = tempColor;
+            colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
+                            whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
         }
         else rotP(key);
         bool err = contr(); // проверка корректности граней
@@ -821,9 +823,6 @@ bool white_cross_is_done() {
     // 4 - оранжевый
     // 5 - зелёный
 
-    colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
-                    whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
-
     vi arr {getEdge(colorsToDir[1], colorsToDir[2]), getEdge(colorsToDir[1], colorsToDir[3]),
             getEdge(colorsToDir[1], colorsToDir[4]), getEdge(colorsToDir[1], colorsToDir[5])};
 
@@ -833,9 +832,6 @@ bool white_cross_is_done() {
            mcub[arr[3]].mCol[colorsToDir[1]] == Colors[1] && mcub[arr[3]].mCol[colorsToDir[5]] == Colors[5];
 }
 bool white_face_is_done() {
-    colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
-                    whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
-
     vi arr {getCorner(colorsToDir[1], colorsToDir[2], colorsToDir[3]), getCorner(colorsToDir[1], colorsToDir[3], colorsToDir[4]),
             getCorner(colorsToDir[1], colorsToDir[4], colorsToDir[5]), getCorner(colorsToDir[1], colorsToDir[5], colorsToDir[2])};
 
@@ -845,9 +841,6 @@ bool white_face_is_done() {
            mcub[arr[3]].mCol[colorsToDir[1]] == Colors[1] && mcub[arr[3]].mCol[colorsToDir[5]] == Colors[5] && mcub[arr[3]].mCol[colorsToDir[2]] == Colors[2];
 }
 bool second_layer_is_done() {
-    colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
-                    whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
-
     vi arr {getEdge(colorsToDir[2], colorsToDir[3]), getEdge(colorsToDir[3], colorsToDir[4]),
             getEdge(colorsToDir[4], colorsToDir[5]), getEdge(colorsToDir[5], colorsToDir[2])};
 
@@ -857,9 +850,6 @@ bool second_layer_is_done() {
            mcub[arr[3]].mCol[colorsToDir[5]] == Colors[5] && mcub[arr[3]].mCol[colorsToDir[2]] == Colors[2];
 }
 bool last_layer_cross_is_done() {
-    colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
-                    whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
-
     vi arr {getEdge(colorsToDir[0], colorsToDir[2]), getEdge(colorsToDir[0], colorsToDir[3]),
             getEdge(colorsToDir[0], colorsToDir[4]), getEdge(colorsToDir[0], colorsToDir[5])};
 
@@ -869,9 +859,6 @@ bool last_layer_cross_is_done() {
            mcub[arr[3]].mCol[colorsToDir[0]] == Colors[0];
 }
 bool last_face_is_done() {
-    colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
-                    whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
-
     vi arr {getCorner(colorsToDir[0], colorsToDir[2], colorsToDir[3]), getCorner(colorsToDir[0], colorsToDir[3], colorsToDir[4]),
             getCorner(colorsToDir[0], colorsToDir[4], colorsToDir[5]), getCorner(colorsToDir[0], colorsToDir[5], colorsToDir[2])};
 
@@ -881,9 +868,6 @@ bool last_face_is_done() {
            mcub[arr[3]].mCol[colorsToDir[0]] == Colors[0];
 }
 bool set_edges_is_done() {
-    colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
-                    whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
-
     vi arr {getEdge(colorsToDir[0], colorsToDir[2]), getEdge(colorsToDir[0], colorsToDir[3]),
             getEdge(colorsToDir[0], colorsToDir[4]), getEdge(colorsToDir[0], colorsToDir[5])};
 
@@ -893,8 +877,6 @@ bool set_edges_is_done() {
            mcub[arr[3]].mCol[colorsToDir[5]] == Colors[5];
 }
 bool set_corners_is_done() {
-    colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
-                    whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
 
     vi arr {getCorner(colorsToDir[0], colorsToDir[2], colorsToDir[3]), getCorner(colorsToDir[0], colorsToDir[3], colorsToDir[4]),
             getCorner(colorsToDir[0], colorsToDir[4], colorsToDir[5]), getCorner(colorsToDir[0], colorsToDir[5], colorsToDir[2])};
