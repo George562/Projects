@@ -547,6 +547,7 @@ int main(int argc, char **argv) {
     loadScenarioFunc(set_edges_is_done, set_edges_deal);
     loadScenarioFunc(set_corners_is_done, set_corners_deal);
     update_stage();
+
     // инициализация Glut и создание окна
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_STENCIL);
@@ -806,6 +807,8 @@ void LoadCube() {
             CurDirColors[i] = mappingColors[temp];
         }
     }
+    colorsToDir = { whitchIndex(CurDirColors, 0), whitchIndex(CurDirColors, 1), whitchIndex(CurDirColors, 2),
+                    whitchIndex(CurDirColors, 3), whitchIndex(CurDirColors, 4), whitchIndex(CurDirColors, 5) };
 }
 
 void SolveIt() {
@@ -877,7 +880,6 @@ bool set_edges_is_done() {
            mcub[arr[3]].mCol[colorsToDir[5]] == Colors[5];
 }
 bool set_corners_is_done() {
-
     vi arr {getCorner(colorsToDir[0], colorsToDir[2], colorsToDir[3]), getCorner(colorsToDir[0], colorsToDir[3], colorsToDir[4]),
             getCorner(colorsToDir[0], colorsToDir[4], colorsToDir[5]), getCorner(colorsToDir[0], colorsToDir[5], colorsToDir[2])};
 
