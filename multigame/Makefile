@@ -42,11 +42,14 @@ chat.h.gch: chat.h text.h.gch
 text.h.gch: text.h tools.h.gch
 	$(CC) text.h -O3
 
-tools.h.gch: tools.h scale.h.gch
+tools.h.gch: tools.h scale.h.gch textures.h.gch
 	$(CC) tools.h -O3
 
 scale.h.gch: scale.h
 	$(CC) scale.h -O3
+
+textures.h.gch: textures.h
+	$(CC) textures.h -O3
 
 server: server.o tools.h.gch
 	$(CC) server.o $(CFLAGS) -o server

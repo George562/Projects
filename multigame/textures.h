@@ -19,6 +19,5 @@ void LoadAllTextures() {
     YellowPanel.    loadFromFile("sources/YellowPanel.png"      );
     YellowPanel.    loadFromFile("sources/YellowPanelPushed.png");
     SteelFrame.     loadFromFile("sources/SteelFrame.png"       );
-    SteelFrame.     loadFromFile("sources/SteelFramePushed.png" );
     PlayerTexture.  loadFromFile("sources/Player.png"           );
 }

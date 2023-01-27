@@ -18,7 +18,7 @@
 #include "textures.h"
 #define M_PI       3.14159265358979323846   // pi
 
-namespace LocationIdex {
+namespace LocationIndex {
     unsigned short int nothing = 0;
     unsigned short int wall = 1;
     unsigned short int box = 2;
@@ -226,14 +226,14 @@ void LoadLocation(location& arr, vvr& wallsRect, std::vector<sf::Sprite>& Sprite
     wallsRect.assign(n, vr(m));
     for (int i = 0; i <= n * 2; i++)
         for (int j = 0; j <= m * 2; j++) {
-            if (arr[i][j] == LocationIdex::wall) {
+            if (arr[i][j] == LocationIndex::wall) {
                 if (i % 2 == 1) // |
                     wallsRect[i][j] = {(size * j - minisize) / 2, size * (i - 1) / 2.f, minisize, float(size)};
                 else // -
                     wallsRect[i][j] = {size * (j - 1) / 2.f, (size * i - minisize) / 2, float(size), minisize};
             } else  {
                 wallsRect[i][j] = {-1, -1, -1, -1};
-                if (arr[i][j] == LocationIdex::box) {
+                if (arr[i][j] == LocationIndex::box) {
                     sf::Texture* tempTexture = new sf::Texture;
                     tempTexture->loadFromFile("sources/Box.png");
                     sf::Sprite* tempSprite = new sf::Sprite;

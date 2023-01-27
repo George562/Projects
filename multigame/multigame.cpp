@@ -46,7 +46,7 @@ bool MiniMapActivated;
 sf::Vector2f CameraPos(0, 0), miniCameraPos((scw - m * miniSize) / 2, (sch - n * miniSize) / 2);
 float WallMinSize = size / 8, WallMaxSize = size;
 location LabirintWalls(0);
-location WaitingRoomWalls(0);
+location WaitingRoomWalls(0); bool isWaitingRoom = false;
 vvr wallsRect(0);
 std::vector<sf::Sprite> Sprites(0);
 sf::Sprite tempSprite;
@@ -451,6 +451,7 @@ int main() {
                             n = LabirintWalls.size() / 2;
                             m = LabirintWalls[0].size() / 2;
                             player.setPosition(size, size);
+                            isWaitingRoom = true;
                             std::cout << "bruh!\n";
                         }
                         else if (event.key.code == sf::Keyboard::Tab) MiniMapActivated = !MiniMapActivated;
@@ -498,14 +499,10 @@ void draw() {
                 sf::FloatRect fr = s.getGlobalBounds();
                 if (in({fr.left, fr.top, fr.width, fr.height}, CameraPos.x, CameraPos.x, scw, sch)) {
                     s.setPosition(s.getPosition() - CameraPos);
-                            // std::cout << "bruh\n";
                     window.draw(s);
-                            // std::cout << "bruh\n";
                     s.setPosition(s.getPosition() + CameraPos);
-                            // std::cout << "bruh\n";
                 }
             }
-                            // std::cout << "bruh\n";
             player.draw(window);
             for (int i = 0; i < Bullets.size(); i++)
                 Bullets[i].draw(window, CameraPos);
@@ -749,70 +746,70 @@ void funcOfClient() {
                 while (!ReceivePacket.endOfPacket()) {
                     ReceivePacket >> packetState;
                     switch (packetState) {
-                    case pacetStates::disconnect:
-                        SelfDisconnect();
-                        break;
-                    case pacetStates::PlayerConnect:
-                        ReceivePacket >> PacetData;
-                        ListOfPlayers.addWord(PacetData);
-                        { Player* NewPlayer = new Player();
-                          NewPlayer->Camera = &CameraPos;
-                          ConnectedPlayers.push_back(*NewPlayer);
-                          }
-                        std::cout << PacetData + " connected\n";
-                        break;
-                    case pacetStates::PlayerDisconnect:
-                        int index;
-                        ReceivePacket >> index;
-                        std::cout << ListOfPlayers[index] << " disconnected\n";
-                        if (index < ComputerID) ComputerID--;
-                        ListOfPlayers.removeWord(index);
-                        ConnectedPlayers.erase(ConnectedPlayers.begin() + index);
-                        break;
-                    case pacetStates::Labirint:
-                        std::cout << "Labirint receiving\n";
-                        ReceivePacket >> n >> m;
-                        std::cout << "n = " << n << " m = " << m << '\n';
-                        LabirintWalls.assign(BigN, vu(BigM, 0));
-                        wallsRect.assign(BigN, vr(BigM, {-1, -1, -1, -1}));
-                        bool tempBool;
-                        for (int i = 0; i <= n * 2; i++)
-                            for (int j = 0; j <= m * 2; j++) {
-                                ReceivePacket >> tempBool; LabirintWalls[i][j] = tempBool;
-                                if (LabirintWalls[i][j]) {
-                                    if (i % 2 == 1) // |
-                                        wallsRect[i][j] = {(size * j - WallMinSize) / 2, size * (i - 1) / 2.f, WallMinSize, float(size)};
-                                    else // -
-                                        wallsRect[i][j] = {size * (j - 1) / 2.f, (size * i - WallMinSize) / 2, float(size), WallMinSize};
-                                }
+                        case pacetStates::disconnect:
+                            SelfDisconnect();
+                            break;
+                        case pacetStates::PlayerConnect:
+                            ReceivePacket >> PacetData;
+                            ListOfPlayers.addWord(PacetData);
+                            { Player* NewPlayer = new Player();
+                            NewPlayer->Camera = &CameraPos;
+                            ConnectedPlayers.push_back(*NewPlayer);
+                            }
+                            std::cout << PacetData + " connected\n";
+                            break;
+                        case pacetStates::PlayerDisconnect:
+                            int index;
+                            ReceivePacket >> index;
+                            std::cout << ListOfPlayers[index] << " disconnected\n";
+                            if (index < ComputerID) ComputerID--;
+                            ListOfPlayers.removeWord(index);
+                            ConnectedPlayers.erase(ConnectedPlayers.begin() + index);
+                            break;
+                        case pacetStates::Labirint:
+                            std::cout << "Labirint receiving\n";
+                            ReceivePacket >> n >> m;
+                            std::cout << "n = " << n << " m = " << m << '\n';
+                            LabirintWalls.assign(BigN, vu(BigM, 0));
+                            wallsRect.assign(BigN, vr(BigM, {-1, -1, -1, -1}));
+                            bool tempBool;
+                            for (int i = 0; i <= n * 2; i++)
+                                for (int j = 0; j <= m * 2; j++) {
+                                    ReceivePacket >> tempBool; LabirintWalls[i][j] = tempBool;
+                                    if (LabirintWalls[i][j]) {
+                                        if (i % 2 == 1) // |
+                                            wallsRect[i][j] = {(size * j - WallMinSize) / 2, size * (i - 1) / 2.f, WallMinSize, float(size)};
+                                        else // -
+                                            wallsRect[i][j] = {size * (j - 1) / 2.f, (size * i - WallMinSize) / 2, float(size), WallMinSize};
+                                    }
+                            }
+                            std::cout << "Labirint receive\n";
+                            break;
+                        case pacetStates::PlayerPos:
+                            for (int i = 0; i < ConnectedPlayers.size(); i++) 
+                                if (i != ComputerID)
+                                    ReceivePacket >> ConnectedPlayers[i];
+                                else
+                                    ReceivePacket >> tempPoint;
+                            break;
+                        case pacetStates::SetPos:
+                            for (Player& x: ConnectedPlayers) ReceivePacket >> x;
+                            player.setPosition(ConnectedPlayers[ComputerID].getPosition());
+                            CameraPos = {player.PosX - scw / 2 + player.radius, player.PosY - sch / 2 + player.radius};
+                            break;
+                        case pacetStates::ChatEvent:
+                            ReceivePacket >> PacetData;
+                            chat.addLine(PacetData);
+                            break;
+                        case pacetStates::Shooting: {
+                            int i; ReceivePacket >> i;
+                            for (; i > 0; i--) {
+                                ReceivePacket >> tempBullet;
+                                tempBullet.Setting();
+                                Bullets.push_back(tempBullet);
+                            }
+                            break;
                         }
-                        std::cout << "Labirint receive\n";
-                        break;
-                    case pacetStates::PlayerPos:
-                        for (int i = 0; i < ConnectedPlayers.size(); i++) 
-                            if (i != ComputerID)
-                                ReceivePacket >> ConnectedPlayers[i];
-                            else
-                                ReceivePacket >> tempPoint;
-                        break;
-                    case pacetStates::SetPos:
-                        for (Player& x: ConnectedPlayers) ReceivePacket >> x;
-                        player.setPosition(ConnectedPlayers[ComputerID].getPosition());
-                        CameraPos = {player.PosX - scw / 2 + player.radius, player.PosY - sch / 2 + player.radius};
-                        break;
-                    case pacetStates::ChatEvent:
-                        ReceivePacket >> PacetData;
-                        chat.addLine(PacetData);
-                        break;
-                    case pacetStates::Shooting: {
-                        int i; ReceivePacket >> i;
-                        for (; i > 0; i--) {
-                            ReceivePacket >> tempBullet;
-                            tempBullet.Setting();
-                            Bullets.push_back(tempBullet);
-                        }
-                        }
-                        break;
                     }
                 }
     }
@@ -829,14 +826,14 @@ void LevelGenerate() {
     wallsRect.assign(BigN, vr(BigM));
     for (int i = 0; i <= n * 2; i++)
         for (int j = 0; j <= m * 2; j++) {
-            if (LabirintWalls[i][j] == LocationIdex::wall) {
+            if (LabirintWalls[i][j] == LocationIndex::wall) {
                 if (i % 2 == 1) // |
                     wallsRect[i][j] = {(size * j - WallMinSize) / 2, size * (i - 1) / 2.f, WallMinSize, float(size)};
                 else // -
                     wallsRect[i][j] = {size * (j - 1) / 2.f, (size * i - WallMinSize) / 2, float(size), WallMinSize};
             } else  {
                 wallsRect[i][j] = {-1, -1, -1, -1};
-                if (LabirintWalls[i][j] == LocationIdex::box) {
+                if (LabirintWalls[i][j] == LocationIndex::box) {
                     tempSprite.setTexture(Box);
                     tempSprite.setPosition(size * j / 2, size * i / 2);
                     Sprites.push_back(tempSprite);
@@ -847,12 +844,15 @@ void LevelGenerate() {
 }
 
 void drawWalls() {
+    location* CurLocation = nullptr;
+    if (isWaitingRoom) CurLocation = &WaitingRoomWalls;
+    else CurLocation = &LabirintWalls;
     if (!MiniMapActivated) {
         for (int i = std::max(0, 2 * int(CameraPos.y) / size - 1);
                 i <= std::min(2 * n, 2 * int(CameraPos.y + sch + WallMinSize) / size + 1); i++)
             for (int j = std::max(0, 2 * int(CameraPos.x) / size - 1);
                     j <= std::min(2 * m, 2 * int(CameraPos.x + scw + WallMinSize) / size + 1); j++)
-                if (LabirintWalls[i][j] == LocationIdex::wall)
+                if ((*CurLocation)[i][j] == LocationIndex::wall)
                     if (i % 2 == 1) { // |
                         WallRectV.setPosition(sf::Vector2f(wallsRect[i][j].PosX, wallsRect[i][j].PosY) - CameraPos);
                         window.draw(WallRectV);
@@ -864,7 +864,7 @@ void drawWalls() {
         window.setView(MiniMapView);
         for (int i = 0; i <= n * 2; i++)
             for (int j = 0; j <= m * 2; j++)
-                if (LabirintWalls[i][j] == LocationIdex::wall)
+                if ((*CurLocation)[i][j] == LocationIndex::wall)
                     if (i % 2 == 1) { // |
                     sf::Vertex line[2] = {
                         sf::Vertex(sf::Vector2f((miniSize * j) / 2, miniSize * (i - 1) / 2) + miniCameraPos),
