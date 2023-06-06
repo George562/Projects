@@ -1,0 +1,5 @@
+make.exe --dry-run --keep-going --print-directory
+make.exe: Entering directory 'c:/Users/ngk49/Desktop/Projects/multigame'
+g++ multigame.o -o multigame -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -O3
+make.exe: Leaving directory 'c:/Users/ngk49/Desktop/Projects/multigame'
+ 

@@ -1,0 +1,537 @@
+make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.2
+This program is built by Equation Solution <http://www.Equation.com>.
+# Copyright (C) 1988-2016 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Wed Aug 24 19:13:14 2022
+
+# Variables
+
+# 'override' directive
+GNUMAKEFLAGS := 
+# automatic
+<D = $(patsubst %/,%,$(patsubst %\,%,$(dir $<)))
+# automatic
+?F = $(notdir $?)
+# default
+.SHELLFLAGS := -c
+# makefile
+MAKEFLAGS = pqrR
+# automatic
+?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
+# automatic
+@D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
+# environment
+HOMEDRIVE = C:
+# automatic
+@F = $(notdir $@)
+# automatic
+^D = $(patsubst %/,%,$(patsubst %\,%,$(dir $^)))
+# makefile
+CURDIR := c:/Users/ngk49/Desktop/Projects/multigame
+# default
+SHELL := sh.exe
+# environment
+WINDIR = C:\Windows
+# environment
+VSCODE_NLS_CONFIG = {"locale":"ru","availableLanguages":{"*":"ru"},"_languagePackId":"e2673fac9b3b0beb38d486c37331d2f9.ru","_translationsConfigFile":"C:\\Users\\ngk49\\AppData\\Roaming\\Code\\clp\\e2673fac9b3b0beb38d486c37331d2f9.ru\\tcf.json","_cacheRoot":"C:\\Users\\ngk49\\AppData\\Roaming\\Code\\clp\\e2673fac9b3b0beb38d486c37331d2f9.ru","_resolvedLanguagePackCoreLocation":"C:\\Users\\ngk49\\AppData\\Roaming\\Code\\clp\\e2673fac9b3b0beb38d486c37331d2f9.ru\\e4503b30fc78200f846c62cf8091b76ff5547662","_corruptedFile":"C:\\Users\\ngk49\\AppData\\Roaming\\Code\\clp\\e2673fac9b3b0beb38d486c37331d2f9.ru\\corrupted.info","_languagePackSupport":true}
+# makefile (from 'makefile', line 2)
+CFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -O3
+# environment
+ONEDRIVE = C:\Users\ngk49\OneDrive
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.PY;.PYW
+# ma 
+kefile (from 'makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# environment
+FPS_BROWSER_USER_PROFILE_STRING = Default
+# environment
+TMP = C:\Users\ngk49\AppData\Local\Temp
+# environment
+PROGRAMW6432 = C:\Program Files
+# environment
+PROGRAMDATA = C:\ProgramData
+# environment
+VSCODE_CWD = C:\Users\ngk49\AppData\Local\Programs\Microsoft VS Code
+# default
+MAKE_HOST := x86_64-w64-mingw32
+# environment
+PATH = C:\Program Files (x86)\Common Files\Oracle\Java\javapath;c:\gcc\bin;c:\gcc\libexec\gcc\x86_64-w64-mingw32\11.1.0;c:\gcc\libexec\gcc\x86_64-w64-mingw32\10.3.0;C:\ProgramData\Oracle\Java\javapath;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\;C:\gcc\libexec\gcc\x86_64-w64-mingw32\10.2.0;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Polyspace\R2020b\runtime\win64;C:\Program Files\Polyspace\R2020b\bin;C:\Program Files\CMake\bin;C:\Program Files\Git\cmd;c:\gcc\bin;c:\gcc\libexec\gcc\x86_64-w64-mingw32\11.1.0;c:\gcc\libexec\gcc\x86_64-w64-mingw32\10.3.0;C:\ProgramData\Oracle\Java\javapath;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\;C:\gcc\libexec\gcc\x86_64-w64-mingw32\10.2.0;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Users\ngk49\.cargo\bin;C:\Users\ngk49\AppData\Local\Microsoft\WindowsApps;C:\Users\ngk49\.dotnet\tools;C:\Users\ngk49\AppData\Local\Programs\Microsoft VS Code\bin;C:\swigwin-4.0.2;
+# environment
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+# environment
+ZES_ENABLE_SYSMAN = 1
+# environment
+PROCESSOR_ARCHITECTURE = AMD64
+# environment
+USERPROFILE = C:\Users\ngk49
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# environment
+NUMBER_OF_PROCESSORS = 8
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync load
+# automatic
+%F = $(notdir $%)
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_21072_EYULUPQIAYWRELUN
+# environment
+COMPUTERNAME = GEORGE
+# environment
+EQ_LIBRARY_PATH = C:\gcc\x86_64-w64-mingw32\lib
+# environment
+PROGRAMFILES = C:\Program Files
+# default
+.LOADED := 
+# environment
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+USERNAME = ngk49
+# environment
+PUBLIC = C:\Users\Public
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+VSCODE_CODE_CACHE_PATH = C:\Users\ngk49\AppData\Roaming\Code\CachedData\e4503b30fc78200f846c62cf8091b76ff5547662
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+COMMONPROGRAMFILES = C:\Program Files\Common Files
+# environment
+LOGONSERVER = \\GEORGE
+# environment
+ONEDRIVECONSUMER = C:\Users\ngk49\OneDrive
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# environment
+USERDOMAIN = GEORGE
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# makefile (from 'makefile', line 1)
+CC = g++
+# default
+MAKE_VERSION := 4.2
+# makefile
+.DEFAULT_GOAL := all
+# environment
+PROGRAMFILES(X86) = C:\Program Files (x86)
+# automatic
+%D = $(patsubst %/,%,$(patsubst %\,%,$(dir $%)))
+# environment
+LOCALAPPDATA = C:\Users\ngk49\AppData\Local
+# environment
+PSMODULEPATH = C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+# default
+MAKE_COMMAND := make.exe
+# default
+.VARIABLES := 
+# automatic
+*F = $(notdir $*)
+# environment
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 142 Stepping 12, GenuineIntel
+# environment
+OS = Windows_NT
+# environment
+VSCODE_IPC_HOOK = \\.\pipe\eb91da747d53e46c3eb3649e95952357-1.70.2-main-sock
+# environment
+HOMEPATH = \Users\ngk49
+# environment
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+# environment
+PROMPT = $P$G
+# environment
+MFLAGS = -pqrR
+# automatic
+*D = $(patsubst %/,%,$(patsubst %\,%,$(dir $*)))
+# environment
+SYSTEMROOT = C:\Windows
+# automatic
++D = $(patsubst %/,%,$(patsubst %\,%,$(dir $+)))
+# automatic
++F = $(notdir $+)
+# environment
+APPDATA = C:\Users\ngk49\AppData\Roaming
+# environment
+TEMP = C:\Users\ngk49\AppData\Local\Temp
+# environment
+COMSPEC = C:\Windows\system32\cmd.exe
+# default
+MAKEFILES := 
+# automatic
+<F = $(notdir $<)
+# environment
+LC_ALL = C
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# environment
+SYSTEMDRIVE = C:
+# environment
+SESSIONNAME = Console
+# environment
+PROCESSOR_REVISION = 8e0c
+# default
+.RECIPEPREFIX := 
+# environment
+LANG = C
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
+# environment
+VSCODE_PID = 21072
+# environment
+USERDOMAIN_ROAMINGPROFILE = GEORGE
+# variable set hash-table stats:
+# Load=92/1024=9%, Rehash=0, Collisions=15/118=13%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (key c:/Users/ngk49/Desktop/Projects/multigame, mtime 1661357497ll): 48 files, no impossibilities.
+
+# 48 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+# Not a target:
+scale.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-04-26 10:33:03
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+chat.h:
+#  Implicit rule search has been done.
+#  Last modified 2021-10-09 14:57:24
+#  File has been updated.
+#  Successfully updated.
+
+all: multigame
+#  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/5=0%
+
+client.o: client.cpp
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 61):
+	$(CC) client.cpp -c -O3
+
+client: client.o tools.h.gch
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 58):
+	$(CC) client.o $(CFLAGS) -o client
+
+# Not a target:
+Bar.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-08-24 19:08:33
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+creature.h.gch: creature.h weapon.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-08-24 19:11:05
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 25):
+	$(CC) creature.h -O3
+
+# Not a target:
+panel.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-25 18:23:17
+#  File has been updated.
+#  Successfully updated.
+
+server.o: server.cpp
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 55):
+	$(CC) server.cpp -c -O3
+
+# Not a target:
+button.h:
+#  Implicit rule search has been done.
+#  Last modified 2021-12-30 22:29:49
+#  File has been updated.
+#  Successfully updated.
+
+server: server.o tools.h.gch
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 52):
+	$(CC) server.o $(CFLAGS) -o server
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-08-24 19:11:28
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+text.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-25 18:23:29
+#  File has been updated.
+#  Successfully updated.
+
+scale.h.gch: scale.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-04-26 10:54:02
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 49):
+	$(CC) scale.h -O3
+
+chat.h.gch: chat.h text.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-20 00:31:06
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 40):
+	$(CC) chat.h -O3
+
+# Not a target:
+tools.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-20 00:30:33
+#  File has been updated.
+#  Successfully updated.
+
+Bar.h.gch: Bar.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-08-24 19:11:00
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 31):
+	$(CC) Bar.h -O3
+
+# Not a target:
+player.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-08-24 19:11:21
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+multigame.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-20 00:24:43
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+panel.h.gch: panel.h text.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-20 00:31:11
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 19):
+	$(CC) panel.h -O3
+
+# Not a target:
+client.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-25 17:16:15
+#  File has been updated.
+#  Successfully updated.
+
+button.h.gch: button.h panel.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-20 00:31:14
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 16):
+	$(CC) button.h -O3
+
+# Not a target:
+weapon.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-08-24 19:10:50
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+bullet.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-06-14 10:50:51
+#  File has been updated.
+#  Successfully updated.
+
+text.h.gch: text.h tools.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-20 00:31:03
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 43):
+	$(CC) text.h -O3
+
+# Not a target:
+client.cpp:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 64):
+	del -rf *.o *.gch
+
+tools.h.gch: tools.h scale.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-20 00:31:01
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 46):
+	$(CC) tools.h -O3
+
+player.h.gch: player.h creature.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-08-24 19:11:33
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 22):
+	$(CC) player.h -O3
+
+hide: multigame.o
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 10):
+	$(CC) multigame.o -o multigame $(CFLAGS) -mwindows
+
+# Not a target:
+server.cpp:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+client.h.gch: client.h tools.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-20 00:31:09
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 37):
+	$(CC) client.h -O3
+
+# Not a target:
+creature.h:
+#  Implicit rule search has been done.
+#  Last modified 2022-04-26 10:13:48
+#  File has been updated.
+#  Successfully updated.
+
+weapon.h.gch: weapon.h bullet.h.gch Bar.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-08-24 19:11:02
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 28):
+	$(CC) weapon.h -O3
+
+bullet.h.gch: bullet.h text.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-06-14 20:36:12
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 34):
+	$(CC) bullet.h -O3
+
+multigame: multigame.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := multigame
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := multigame.o
+# automatic
+# | := 
+# automatic
+# < := multigame.o
+# automatic
+# ^ := multigame.o
+# automatic
+# ? := multigame.o
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/13=8%
+#  recipe to execute (from 'makefile', line 7):
+	$(CC) multigame.o -o multigame $(CFLAGS)
+
+multigame.o: multigame.cpp chat.h.gch client.h.gch button.h.gch player.h.gch
+#  Implicit rule search has not been done.
+#  Last modified 2022-08-24 19:11:37
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 13):
+	$(CC) multigame.cpp -c -O3
+
+# files hash-table stats:
+# Load=39/1024=4%, Rehash=0, Collisions=1/104=1%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 56 / storage = 597 B / avg = 10 B
+# current buf: size = 8162 B / used = 597 B / count = 56 / avg = 10 B
+
+# strcache performance: lookups = 134 / hit rate = 58%
+# hash-table stats:
+# Load=56/8192=1%, Rehash=0, Collisions=1/134=1%
+# Finished Make data base on Wed Aug 24 19:13:14 2022
+
+ 
