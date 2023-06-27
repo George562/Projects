@@ -17,7 +17,8 @@ int size = 2, filling = 0, left = 0, top = 0, x, y;
 int to_burn = 8, to_alive = 12, set_x = 3 * scw / 8, set_y = 7 * sch / 16;
 bool drawing = false, pause = true, settings = false;
 std::vector<Dude> dudes(0), new_dudes(0);
-std::vector<int> red = {255,   0,   0}, green = {   0, 255,   0}, white = {200, 200, 200}, changes(0);
+sf::Color red = {255,   0,   0}, green = {   0, 255,   0}, white = {200, 200, 200};
+std::vector<int> changes(0);
 std::vector<Dude> dirs = {{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}};
 Dude bufferDude;
 
@@ -34,15 +35,17 @@ sf::Event event;
 
 bool into(std::vector<Dude>& arr, Dude d) {
     int i = std::lower_bound(arr.begin(), arr.end(), d) - arr.begin();
-    return !(arr.empty() || (arr[i] != d && (i + 1 < arr.size() || arr[i + 1] != d)));
+    return !(arr.empty() || arr[i] != d);
 }
 void add(std::vector<Dude>&, Dude);
 void del(Dude);
 void draw();
 void step();
-void stepfor(int, int);
+void stepfor(int&, int&);
 
 int main() {
+    window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(60);
     std::ios::sync_with_stdio(false); std::cin.tie(nullptr); std::cout.tie();
     font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
     text.setFont(font);
@@ -57,7 +60,7 @@ int main() {
     menu_text.setString("Born\n\nAlive\n\t\t\t0\t1\t2\t3\t4\t5\t6\t7\t8");
     
     menu_plato.setFillColor(sf::Color(20, 20, 20));
-    menu_plato.setOutlineColor(sf::Color(white[0], white[1], white[2]));
+    menu_plato.setOutlineColor(white);
     menu_plato.setOutlineThickness(5);
     menu_plato.setPosition(set_x, set_y);
 
@@ -65,7 +68,7 @@ int main() {
     circle.setOutlineColor(sf::Color(0, 0, 0));
     circle.setOutlineThickness(3);
 
-    rect1.setFillColor(sf::Color(red[0], red[1], red[2]));
+    rect1.setFillColor(red);
 
     sf::Clock clock;
     sf::Time time = clock.getElapsedTime();
@@ -150,7 +153,7 @@ int main() {
 
 void add(std::vector<Dude>& arr, Dude d) {
     int i = std::lower_bound(arr.begin(), arr.end(), d) - arr.begin();
-    if (arr.empty() || (arr[i] != d && (i + 1 < arr.size() || arr[i + 1] != d))) {
+    if (arr.empty() || arr[i] != d) {
         arr.push_back(d);
         for (int j = arr.size() - 1; j > i; j--) std::swap(arr[j], arr[j - 1]);
     }
@@ -159,7 +162,7 @@ void add(std::vector<Dude>& arr, Dude d) {
 void del(Dude d) {
     if (dudes.empty()) return;
     int i = std::lower_bound(dudes.begin(), dudes.end(), d) - dudes.begin();
-    if (i >= dudes.size() || (dudes[i] != d && (i + 1 < dudes.size() || dudes[i + 1] != d))) return;
+    if (i >= dudes.size() || dudes[i] != d) return;
     std::swap(dudes[i], dudes[dudes.size() - 1]);
     for (; i < dudes.size() - 2; i++) std::swap(dudes[i], dudes[i + 1]);
     dudes.pop_back();
@@ -178,13 +181,13 @@ void draw() {
         window.draw(menu_plato);
         window.draw(menu_text);
         for (int i = 0; i < 9; i++) {
-            if (to_burn & (1 << i)) circle.setFillColor(sf::Color(green[0], green[1], green[2]));
-            else circle.setFillColor(sf::Color(red[0], red[1], red[2]));
+            if (to_burn & (1 << i)) circle.setFillColor(green);
+            else circle.setFillColor(red);
             circle.setPosition(set_x + scw / 32 + scw / 53 * (1 + i) - i, set_y + sch / 64 + 3);
             window.draw(circle);
 
-            if (to_alive & (1 << i)) circle.setFillColor(sf::Color(green[0], green[1], green[2]));
-            else circle.setFillColor(sf::Color(red[0], red[1], red[2]));
+            if (to_alive & (1 << i)) circle.setFillColor(green);
+            else circle.setFillColor(red);
             circle.setPosition(set_x + scw / 32 + scw / 53 * (1 + i) - i, set_y + sch / 64 + 50);
             window.draw(circle);
         }
@@ -201,16 +204,23 @@ void step() {
             else stepfor(i, j);
         if (!(count & to_alive)) changes.push_back(i);
     }
-    for (int i = 0; i < changes.size(); i++, size--)
-        std::swap(dudes[changes[i]], dudes[size - 1]);
-    dudes.resize(size);
     std::sort(new_dudes.begin(), new_dudes.end());
-    for (int i = 0; i < new_dudes.size(); i++)
-        if (i == 0 || new_dudes[i - 1] < new_dudes[i]) dudes.push_back(new_dudes[i]);
+    size_t i = 0, j = 0;
+    for (; j < changes.size() && i < new_dudes.size(); i++)
+        if (i == 0 || new_dudes[i - 1] < new_dudes[i])
+            dudes[changes[j++]] = new_dudes[i];
+    if (j != changes.size()) {
+        for (; j < changes.size(); j++, size--)
+            std::swap(dudes[changes[j]], dudes[size - 1]);
+        dudes.resize(size);
+    } else if (i < new_dudes.size()) {
+        for (; i < new_dudes.size(); i++)
+            if (i == 0 || new_dudes[i - 1] < new_dudes[i]) dudes.push_back(new_dudes[i]);
+    }
     std::sort(dudes.begin(), dudes.end());
 }
 
-void stepfor(int i, int j) {
+void stepfor(int& i, int& j) {
     int count = 2;
     bufferDude = dudes[i] + dirs[j];
     for (int k = (j + 5) % 8; k != (j + 4) % 8; k = ++k % 8)
